@@ -1,7 +1,7 @@
 package com.productdock.controller;
 
 import com.productdock.model.SupportedLangauge;
-import com.productdock.service.VoiceSelectorService;
+import com.productdock.service.SupportedVoicesService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
@@ -20,7 +20,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @RequestMapping("/api/languages")
 public class LanguageController {
-    private final VoiceSelectorService voiceSelectorService;
+    private final SupportedVoicesService supportedVoicesService;
 
     /**
      * Endpoint to get the list of supported languages for text-to-speech conversion.
@@ -30,6 +30,6 @@ public class LanguageController {
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<SupportedLangauge>> getSupportedLanguages() {
         log.info("Received request to get supported languages");
-        return ResponseEntity.ok(voiceSelectorService.getSupportedLanguages());
+        return ResponseEntity.ok(supportedVoicesService.getSupportedLanguages());
     }
 }

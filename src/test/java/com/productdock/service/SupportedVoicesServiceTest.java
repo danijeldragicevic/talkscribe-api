@@ -6,13 +6,13 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class VoiceSelectorServiceTest {
+public class SupportedVoicesServiceTest {
 
-    private VoiceSelectorService voiceSelectorService;
+    private SupportedVoicesService supportedVoicesService;
 
     @BeforeEach
     void setUp() {
-        voiceSelectorService = new VoiceSelectorService();
+        supportedVoicesService = new SupportedVoicesService();
     }
 
     @Test
@@ -30,14 +30,14 @@ public class VoiceSelectorServiceTest {
 
     @Test
     void shouldFallbackToDefaultForUnknownLanguage() {
-        VoiceSelection result = voiceSelectorService.selectVoice("xx");
+        VoiceSelection result = supportedVoicesService.selectVoice("xx");
         assertEquals("en-US", result.getPollyLocaleCode());
         assertEquals("Joanna", result.getPollyVoiceId());
     }
 
     // Helper method to keep tests DRY
     private void assertVoice(String inputLanguage, String expectedLocale, String expectedVoice) {
-        VoiceSelection result = voiceSelectorService.selectVoice(inputLanguage);
+        VoiceSelection result = supportedVoicesService.selectVoice(inputLanguage);
         assertEquals(expectedLocale, result.getPollyLocaleCode(), "Locale mismatch for language: " + inputLanguage);
         assertEquals(expectedVoice, result.getPollyVoiceId(), "Voice mismatch for language: " + inputLanguage);
     }

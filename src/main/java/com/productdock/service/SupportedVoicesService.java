@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 @Service
-public class VoiceSelectorService {
+public class SupportedVoicesService {
 
     // Map Comprehend language codes → Polly locale codes
     private static final Map<String, String> LANG_CODE_TO_LOCALE_MAP = Map.of(
@@ -26,7 +26,7 @@ public class VoiceSelectorService {
             "pt", "pt-BR"
     );
 
-    // Map Polly locale codes → preferred Polly voice IDs
+    // Map Polly locale codes → Polly voice IDs
     private static final Map<String, String> LOCALE_TO_VOICE_MAP = Map.of(
             "en-US", "Joanna",
             "de-DE", "Vicki",

@@ -32,7 +32,7 @@ class TextToSpeechServiceTest {
     private PollyRepository pollyRepository;
 
     @Mock
-    private VoiceSelectorService voiceSelectorService;
+    private SupportedVoicesService supportedVoicesService;
 
     private TextToSpeechService textToSpeechService;
 
@@ -40,7 +40,7 @@ class TextToSpeechServiceTest {
 
     @BeforeEach
     void setUp() {
-        textToSpeechService = new TextToSpeechService(comprehendRepository, pollyRepository, voiceSelectorService);
+        textToSpeechService = new TextToSpeechService(comprehendRepository, pollyRepository, supportedVoicesService);
     }
 
 
@@ -52,7 +52,7 @@ class TextToSpeechServiceTest {
         when(comprehendRepository.detectLanguage(SAMPLE_TEXT)).thenReturn("en");
 
         VoiceSelection mockVoice = new VoiceSelection("en-US", "Joanna");
-        when(voiceSelectorService.selectVoice("en")).thenReturn(mockVoice);
+        when(supportedVoicesService.selectVoice("en")).thenReturn(mockVoice);
 
         when(pollyRepository.convertTextToSpeech(SAMPLE_TEXT, mockVoice.getPollyVoiceId(), mockVoice.getPollyLocaleCode())).thenReturn(mockAudioStream);
 
@@ -70,7 +70,7 @@ class TextToSpeechServiceTest {
         when(comprehendRepository.detectLanguage(SAMPLE_TEXT)).thenReturn("en");
 
         VoiceSelection mockVoice = new VoiceSelection("en-US", "Joanna");
-        when(voiceSelectorService.selectVoice("en")).thenReturn(mockVoice);
+        when(supportedVoicesService.selectVoice("en")).thenReturn(mockVoice);
 
         when(pollyRepository.convertTextToSpeech(SAMPLE_TEXT, mockVoice.getPollyVoiceId(), mockVoice.getPollyLocaleCode()))
                 .thenThrow(new PollyRepositoryException("Repository error", new RuntimeException("Mock error")));

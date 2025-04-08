@@ -25,7 +25,7 @@ import java.io.InputStream;
 public class TextToSpeechService {
     private final ComprehendRepository comprehendRepository;
     private final PollyRepository pollyRepository;
-    private final VoiceSelectorService voiceSelectorService;
+    private final SupportedVoicesService supportedVoicesService;
 
     /**
      * Converts text to speech by detecting language, selecting a suitable voice,
@@ -40,7 +40,7 @@ public class TextToSpeechService {
     public InputStreamResource convertTextToSpeech(String text) throws TextToSpeechServiceException {
         try {
             String languageCode = comprehendRepository.detectLanguage(text);
-            VoiceSelection voiceSelection = voiceSelectorService.selectVoice(languageCode);
+            VoiceSelection voiceSelection = supportedVoicesService.selectVoice(languageCode);
 
             InputStream audioStream = pollyRepository.convertTextToSpeech(text, voiceSelection.getPollyVoiceId(), voiceSelection.getPollyLocaleCode());
             return new InputStreamResource(audioStream);
