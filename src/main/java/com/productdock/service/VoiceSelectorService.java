@@ -10,15 +10,15 @@ public class VoiceSelectorService {
 
     // Map Comprehend language codes → Polly locale codes
     private static final Map<String, String> LANGUAGE_TO_LOCALE_MAP = Map.of(
-            "en", "en-US",
-            "de", "de-DE",
-            "fr", "fr-FR",
-            "es", "es-ES",
-            "sv", "sv-SE",
-            "zh", "cmn-CN",
-            "ar", "arb",
-            "hi", "hi-IN",
-            "pt", "pt-BR"
+            "en", "en-US",           // English (US)
+            "de", "de-DE",                  // German
+            "fr", "fr-FR",                      // France
+            "es", "es-ES",                   // Spanish (Castilian)
+            "sv", "sv-SE",                   // Swedish
+            "zh", "cmn-CN",               // Mandarin Chinese
+            "ar", "arb",                        // Arabic
+            "hi", "hi-IN",                      // Hindi
+            "pt", "pt-BR"                             // Portuguese (Brazil)
     );
 
     // Map Polly locale codes → preferred Polly voice IDs
