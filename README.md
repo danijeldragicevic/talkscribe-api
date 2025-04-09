@@ -4,6 +4,7 @@ TalkScribe API is a Spring Boot application that provides an API for text-to-spe
 
 ## Features
 - Text-to-speech conversion using AWS Polly
+- Supports multiple languages and voices
 
 ## Supported languages
 - Arabic
@@ -74,6 +75,33 @@ Http-Status     200 OK
 Content-Type    application/octet-stream
 ---
 ID3#TSSELavf58.76.100��d�)���!�j22��w'wxy4��D�	�߉\���ר��nO�D'�,
+```
+### Get supported languages
+Endpoint: `GET /api/languages` <br>
+Example Request:
+```commandline
+curl --request GET \
+  --url http://localhost:8080/api/languages
+```
+Example Response:
+```commandline
+Http-Status     200 OK
+Content-Type    application/json
+---
+[
+    {
+        "languageCode": "de",
+        "languageName": "German",
+        "locale": "de-DE",
+        "voice": "Vicki"
+    },
+    {
+        "languageCode": "en",
+        "languageName": "English (US)",
+        "locale": "en-US",
+        "voice": "Joanna"
+    }
+]
 ```
 ### Error Handling
 The application provides meaningful error responses, for example:
