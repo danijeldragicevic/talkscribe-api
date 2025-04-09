@@ -20,6 +20,7 @@ public class SupportedVoicesServiceTest {
 
     @Test
     void shouldReturnCorrectVoiceForKnownLanguages() {
+        // Test for various languages
         assertVoice("us", "en-US", "Joanna");
         assertVoice("de", "de-DE", "Vicki");
         assertVoice("fr", "fr-FR", "Lea");
@@ -33,6 +34,7 @@ public class SupportedVoicesServiceTest {
 
     @Test
     void shouldFallbackToDefaultForUnknownLanguage() {
+        // Test for an unknown language
         VoiceSelection result = supportedVoicesService.selectVoice("xx");
         assertEquals("en-US", result.getPollyLocaleCode());
         assertEquals("Joanna", result.getPollyVoiceId());
@@ -40,10 +42,13 @@ public class SupportedVoicesServiceTest {
 
     @Test
     void shouldReturnAllSupportedLanguages() {
+        // Get all supported languages
         List<SupportedLangauge> supportedLanguages = supportedVoicesService.getSupportedLanguages();
 
+        // Verify the number of supported languages
         assertEquals(9, supportedLanguages.size(), "Unexpected number of supported languages");
 
+        // Verify the properties of each supported language
         assertLanguage(supportedLanguages.get(0), "ar", "Arabic", "arb", "Hala");
         assertLanguage(supportedLanguages.get(1), "de", "German", "de-DE", "Vicki");
         assertLanguage(supportedLanguages.get(2), "en", "English (US)", "en-US", "Joanna");
