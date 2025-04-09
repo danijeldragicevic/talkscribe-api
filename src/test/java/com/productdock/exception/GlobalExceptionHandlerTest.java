@@ -15,7 +15,7 @@ import org.springframework.web.context.request.WebRequest;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 /**
  * Test class for GlobalExceptionHandler.
@@ -31,15 +31,17 @@ class GlobalExceptionHandlerTest {
 
     @Test
     void shouldHandleTextToSpeechServiceException() {
+        // Given
         TextToSpeechServiceException exception = new TextToSpeechServiceException("Failed to convert text to speech", new RuntimeException("Mock error"));
-
         ServletWebRequest servletWebRequest = Mockito.mock(ServletWebRequest.class);
         HttpServletRequest mockHttpRequest = Mockito.mock(HttpServletRequest.class);
+
+        // When
         when(servletWebRequest.getRequest()).thenReturn(mockHttpRequest);
         when(mockHttpRequest.getRequestURI()).thenReturn("/api/text-to-speech");
 
+        // Then
         ResponseEntity<ErrorResponse> response = exceptionHandler.handleTextToSpeechServiceException(exception, servletWebRequest);
-
         assertEquals(HttpStatus.SERVICE_UNAVAILABLE, response.getStatusCode());
         assertNotNull(response.getBody());
         assertEquals("Failed to convert text to speech", response.getBody().getError());
