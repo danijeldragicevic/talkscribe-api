@@ -41,28 +41,36 @@ class PollyRepositoryTest {
 
     @Test
     void shouldConvertTextToSpeechSuccessfully() {
-        InputStream mockAudioStream = new ByteArrayInputStream("mock audio data".getBytes());
+        // Given
+        InputStream audio = new ByteArrayInputStream("audio data".getBytes());
         ResponseInputStream<SynthesizeSpeechResponse> mockResponse =
-                new ResponseInputStream<>(SynthesizeSpeechResponse.builder().build(), mockAudioStream);
+                new ResponseInputStream<>(SynthesizeSpeechResponse.builder().build(), audio);
 
+        // When
         when(pollyClient.synthesizeSpeech(any(SynthesizeSpeechRequest.class))).thenReturn(mockResponse);
-
         InputStream result = pollyRepository.convertTextToSpeech(SAMPLE_TEXT, "Joanna", "en-US");
 
+        // Then
         assertNotNull(result, "The response should not be null");
         assertDoesNotThrow(() -> result.read(), "Should return a valid InputStream");
+
+        // Verify
+        verify(pollyClient, times(1)).synthesizeSpeech(any(SynthesizeSpeechRequest.class));
     }
 
     @Test
     void shouldThrowExceptionWhenPollyFails() {
+        // When
         when(pollyClient.synthesizeSpeech(any(SynthesizeSpeechRequest.class)))
                 .thenThrow(PollyException.builder().message("AWS Polly Error").build());
 
         PollyRepositoryException exception = assertThrows(PollyRepositoryException.class,
                 () -> pollyRepository.convertTextToSpeech(SAMPLE_TEXT, "Joanna", "en-US"));
 
+        // Then
         assertEquals("AWS Polly error", exception.getMessage());
 
+        // Verify
         verify(pollyClient, times(1)).synthesizeSpeech(any(SynthesizeSpeechRequest.class));
     }
 }
