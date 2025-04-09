@@ -37,6 +37,7 @@ public class ComprehendRepositoryTest {
 
     @Test
     void shouldReturnDetectedLanguageCode() throws ComprehendRepositoryException {
+        // Given
         DominantLanguage language = DominantLanguage.builder()
                 .languageCode("fr")
                 .score(0.98f)
@@ -46,37 +47,44 @@ public class ComprehendRepositoryTest {
                 .languages(language)
                 .build();
 
+        // When
         when(comprehendClient.detectDominantLanguage(any(DetectDominantLanguageRequest.class)))
                 .thenReturn(response);
 
+        // Then
         String result = comprehendRepository.detectLanguage("Bonjour, comment ça va ?");
-
         assertEquals("fr", result);
 
+        // Verify
         verify(comprehendClient, times(1)).detectDominantLanguage(any(DetectDominantLanguageRequest.class));
     }
 
     @Test
     void shouldReturnDefaultLanguageCode() throws ComprehendRepositoryException {
+        // Given
         DetectDominantLanguageResponse response = DetectDominantLanguageResponse.builder()
                 .languages(List.of())
                 .build();
 
+        // When
         when(comprehendClient.detectDominantLanguage(any(DetectDominantLanguageRequest.class)))
                 .thenReturn(response);
 
+        // Then
         String result = comprehendRepository.detectLanguage("Unintelligible text");
-
         assertEquals("en", result);
 
+        // Verify
         verify(comprehendClient, times(1)).detectDominantLanguage(any(DetectDominantLanguageRequest.class));
     }
 
     @Test
     void shouldThrowExceptionWhenComprehendFails() {
+        // When
         when(comprehendClient.detectDominantLanguage(any(DetectDominantLanguageRequest.class)))
                 .thenThrow(ComprehendException.builder().message("AWS Comprehend error").build());
 
+        // Then
         ComprehendRepositoryException exception = assertThrows(ComprehendRepositoryException.class,
                 () -> comprehendRepository.detectLanguage("Some text"));
 
