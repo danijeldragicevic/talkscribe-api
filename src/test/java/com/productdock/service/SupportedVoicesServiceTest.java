@@ -42,10 +42,8 @@ public class SupportedVoicesServiceTest {
     void shouldReturnAllSupportedLanguages() {
         List<SupportedLangauge> supportedLanguages = supportedVoicesService.getSupportedLanguages();
 
-        // Verify the size of the list
         assertEquals(9, supportedLanguages.size(), "Unexpected number of supported languages");
 
-        // Verify the properties of each language
         assertLanguage(supportedLanguages.get(0), "ar", "Arabic", "arb", "Hala");
         assertLanguage(supportedLanguages.get(1), "de", "German", "de-DE", "Vicki");
         assertLanguage(supportedLanguages.get(2), "en", "English (US)", "en-US", "Joanna");

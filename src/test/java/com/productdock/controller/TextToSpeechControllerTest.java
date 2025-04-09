@@ -49,18 +49,14 @@ class TextToSpeechControllerTest {
 
     @Test
     void shouldConvertTextToSpeech() throws Exception {
-        // Given
         String text = "Hello, World!";
         TextToSpeechRequest request = new TextToSpeechRequest(text);
-        InputStreamResource resource = new InputStreamResource(new ByteArrayInputStream("audio data".getBytes()));
 
-        // Mock service behavior
+        InputStreamResource resource = new InputStreamResource(new ByteArrayInputStream("audio data".getBytes()));
         when(textToSpeechService.convertTextToSpeech(text)).thenReturn(resource);
 
-        // Convert request to JSON
         String jsonRequest = objectMapper.writeValueAsString(request);
 
-        // Perform the request and validate response
         mockMvc.perform(post("/api/text-to-speech")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonRequest))
@@ -70,11 +66,9 @@ class TextToSpeechControllerTest {
 
     @Test
     void shouldReturnBadRequestWhenTextIsBlank() throws Exception {
-        // Given: An invalid request (empty text)
         TextToSpeechRequest request = new TextToSpeechRequest("");
         String jsonRequest = objectMapper.writeValueAsString(request);
 
-        // When: Performing a POST request and validate response
         mockMvc.perform(post("/api/text-to-speech")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonRequest))

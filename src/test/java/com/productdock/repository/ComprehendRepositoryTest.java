@@ -37,7 +37,6 @@ public class ComprehendRepositoryTest {
 
     @Test
     void shouldReturnDetectedLanguageCode() throws ComprehendRepositoryException {
-        // Given: Mock AWS Comprehend response
         DominantLanguage language = DominantLanguage.builder()
                 .languageCode("fr")
                 .score(0.98f)
@@ -50,19 +49,15 @@ public class ComprehendRepositoryTest {
         when(comprehendClient.detectDominantLanguage(any(DetectDominantLanguageRequest.class)))
                 .thenReturn(response);
 
-        // When: Calling the repository method
         String result = comprehendRepository.detectLanguage("Bonjour, comment ça va ?");
 
-        // Then: Verify correct behaviour
         assertEquals("fr", result);
 
-        // Ensure that the comprehendClient was called once
         verify(comprehendClient, times(1)).detectDominantLanguage(any(DetectDominantLanguageRequest.class));
     }
 
     @Test
     void shouldReturnDefaultLanguageCode() throws ComprehendRepositoryException {
-        // Given: Mock AWS Comprehend response
         DetectDominantLanguageResponse response = DetectDominantLanguageResponse.builder()
                 .languages(List.of())
                 .build();
@@ -70,27 +65,21 @@ public class ComprehendRepositoryTest {
         when(comprehendClient.detectDominantLanguage(any(DetectDominantLanguageRequest.class)))
                 .thenReturn(response);
 
-        // When: Calling the repository method
         String result = comprehendRepository.detectLanguage("Unintelligible text");
 
-        // Then: Verify correct behaviour
         assertEquals("en", result);
 
-        // Ensure that the comprehendClient was called once
         verify(comprehendClient, times(1)).detectDominantLanguage(any(DetectDominantLanguageRequest.class));
     }
 
     @Test
     void shouldThrowExceptionWhenComprehendFails() {
-        // Given: Simulate AWS Comprehend failure
         when(comprehendClient.detectDominantLanguage(any(DetectDominantLanguageRequest.class)))
                 .thenThrow(ComprehendException.builder().message("AWS Comprehend error").build());
 
-        // When: Calling the repository method
         ComprehendRepositoryException exception = assertThrows(ComprehendRepositoryException.class,
                 () -> comprehendRepository.detectLanguage("Some text"));
 
-        // Then: Verify exception handling
         assertEquals("AWS Comprehend error", exception.getMessage());
     }
 }
