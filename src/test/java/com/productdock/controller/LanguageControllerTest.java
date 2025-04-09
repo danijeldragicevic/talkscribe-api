@@ -1,6 +1,5 @@
 package com.productdock.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.productdock.model.SupportedLangauge;
 import com.productdock.service.SupportedVoicesService;
 import org.junit.jupiter.api.BeforeEach;
@@ -16,7 +15,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.util.List;
 
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -24,7 +23,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class LanguageControllerTest {
 
     private MockMvc mockMvc;
-    private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Mock
     private SupportedVoicesService supportedVoicesService;
@@ -42,13 +40,16 @@ class LanguageControllerTest {
 
     @Test
     void shouldReturnSupportedLanguages() throws Exception {
+        // Given
         List<SupportedLangauge> mockLanguages = List.of(
                 new SupportedLangauge("en", "English (US)", "en-US", "Joanna"),
                 new SupportedLangauge("de", "German", "de-DE", "Vicki")
         );
 
+        // When
         when(supportedVoicesService.getSupportedLanguages()).thenReturn(mockLanguages);
 
+        // Then
         mockMvc.perform(get("/api/languages")
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -62,5 +63,8 @@ class LanguageControllerTest {
                 .andExpect(jsonPath("$[1].languageName").value("German"))
                 .andExpect(jsonPath("$[1].locale").value("de-DE"))
                 .andExpect(jsonPath("$[1].voice").value("Vicki"));
+
+        // Verify
+        verify(supportedVoicesService, times(1)).getSupportedLanguages();
     }
 }
