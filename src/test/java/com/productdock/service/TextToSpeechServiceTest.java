@@ -43,34 +43,40 @@ class TextToSpeechServiceTest {
         textToSpeechService = new TextToSpeechService(comprehendRepository, pollyRepository, supportedVoicesService);
     }
 
-
     @Test
     void shouldConvertTextToSpeechSuccessfully() throws ComprehendRepositoryException {
-        InputStream mockAudioStream = new ByteArrayInputStream("mock audio data".getBytes());
-
-        when(comprehendRepository.detectLanguage(SAMPLE_TEXT)).thenReturn("en");
-
+        // Given
+        InputStream audio = new ByteArrayInputStream("audio data".getBytes());
         VoiceSelection mockVoice = new VoiceSelection("en-US", "Joanna");
+
+        // When
+        when(comprehendRepository.detectLanguage(SAMPLE_TEXT)).thenReturn("en");
         when(supportedVoicesService.selectVoice("en")).thenReturn(mockVoice);
+        when(pollyRepository.convertTextToSpeech(SAMPLE_TEXT, mockVoice.getPollyVoiceId(), mockVoice.getPollyLocaleCode())).thenReturn(audio);
 
-        when(pollyRepository.convertTextToSpeech(SAMPLE_TEXT, mockVoice.getPollyVoiceId(), mockVoice.getPollyLocaleCode())).thenReturn(mockAudioStream);
-
+        // Then
         InputStreamResource result = textToSpeechService.convertTextToSpeech(SAMPLE_TEXT);
-
         assertNotNull(result, "The response should not be null");
         assertDoesNotThrow(() -> result.getInputStream(), "Should return a valid InputStream");
+
+        // Verify
+        verify(comprehendRepository, times(1)).detectLanguage(SAMPLE_TEXT);
+        verify(supportedVoicesService, times(1)).selectVoice("en");
+        verify(pollyRepository, times(1)).convertTextToSpeech(SAMPLE_TEXT, mockVoice.getPollyVoiceId(), mockVoice.getPollyLocaleCode());
     }
 
     @Test
     void shouldThrowServiceExceptionWhenRepositoryFails() throws ComprehendRepositoryException {
-        when(comprehendRepository.detectLanguage(SAMPLE_TEXT)).thenReturn("en");
-
+        // Given
         VoiceSelection mockVoice = new VoiceSelection("en-US", "Joanna");
-        when(supportedVoicesService.selectVoice("en")).thenReturn(mockVoice);
 
+        // When
+        when(comprehendRepository.detectLanguage(SAMPLE_TEXT)).thenReturn("en");
+        when(supportedVoicesService.selectVoice("en")).thenReturn(mockVoice);
         when(pollyRepository.convertTextToSpeech(SAMPLE_TEXT, mockVoice.getPollyVoiceId(), mockVoice.getPollyLocaleCode()))
                 .thenThrow(new PollyRepositoryException("Repository error", new RuntimeException("Mock error")));
 
+        // Then
         TextToSpeechServiceException exception = assertThrows(
                 TextToSpeechServiceException.class,
                 () -> textToSpeechService.convertTextToSpeech(SAMPLE_TEXT),
