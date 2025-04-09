@@ -49,29 +49,39 @@ class TextToSpeechControllerTest {
 
     @Test
     void shouldConvertTextToSpeech() throws Exception {
+        // Given
         String text = "Hello, World!";
         TextToSpeechRequest request = new TextToSpeechRequest(text);
-
-        InputStreamResource resource = new InputStreamResource(new ByteArrayInputStream("audio data".getBytes()));
-        when(textToSpeechService.convertTextToSpeech(text)).thenReturn(resource);
-
         String jsonRequest = objectMapper.writeValueAsString(request);
+        InputStreamResource audio = new InputStreamResource(new ByteArrayInputStream("audio data".getBytes()));
 
+        // When
+        when(textToSpeechService.convertTextToSpeech(text)).thenReturn(audio);
+
+        // Then
         mockMvc.perform(post("/api/text-to-speech")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonRequest))
                         .andExpect(status().isOk())
                         .andExpect(content().contentType(MediaType.APPLICATION_OCTET_STREAM));
+
+        // Verify
+        verify(textToSpeechService, times(1)).convertTextToSpeech(text);
     }
 
     @Test
     void shouldReturnBadRequestWhenTextIsBlank() throws Exception {
+        // Given
         TextToSpeechRequest request = new TextToSpeechRequest("");
         String jsonRequest = objectMapper.writeValueAsString(request);
 
+        // Then
         mockMvc.perform(post("/api/text-to-speech")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonRequest))
                         .andExpect(status().isBadRequest());
+
+        // Verify
+        verify(textToSpeechService, never()).convertTextToSpeech(anyString());
     }
 }
