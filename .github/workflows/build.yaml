@@ -27,6 +27,7 @@ jobs:
         with:
           name: talkscribe-api-jar
           path: target/*.jar
+          retention-days: 1
 
   # Build the Docker image
   build-docker:
@@ -47,9 +48,9 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y docker-compose
 
-      - name: Build Docker Image
+      - name: Build Docker Image (Quiet Mode)
         run: |
-          docker-compose build
+          docker-compose build --quiet
           docker tag talkscribe-api-image:latest talkscribe-api:latest
 
       - name: Save Docker Image as Artifact
@@ -60,9 +61,13 @@ jobs:
         with:
           name: docker-image
           path: docker-image.tar
+          retention-days: 1
 
       - name: Clean Up Docker Image Tarball
         run: rm -f docker-image.tar
+
+      - name: Docker Cleanup
+        run: docker system prune -af
 
   # Push the Docker image to Amazon ECR
   push-to-ecr:
@@ -81,6 +86,11 @@ jobs:
       - name: Load Docker Image
         run: docker load -i docker-image.tar
 
+      - name: Verify AWS CLI & Docker
+        run: |
+          aws --version
+          docker --version
+
       - name: Log in to Amazon ECR
         run: |
           aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -93,3 +103,6 @@ jobs:
 
       - name: Push Docker Image to Amazon ECR
         run: docker push ${{ secrets.ECR_REPOSITORY_URL }}:latest
+
+      - name: Docker Cleanup
+        run: docker system prune -af
