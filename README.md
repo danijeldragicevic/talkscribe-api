@@ -55,23 +55,23 @@ Build and run locally:
 ### Docker Image with Buildpacks
 Build Docker Image:
 ```commandline
-./mvnw spring-boot:build-image \
-  -Dspring-boot.build-image.imageName=talkscribe-api:latest
+./mvnw spring-boot:build-image
 ```
 Run Cointainer Locally:
 ```commandline
-docker run -d -p 8080:8080 \ 
-    -e AWS_REGION=$AWS_REGION \ 
-    -e AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID \ 
-    -e AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY \ 
-    talkscribe-api-image:latest
+docker run -d --name talkscribe-api \
+-p 8080:8080 \
+-e AWS_REGION:$AWS_REGION \
+-e AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID \
+-e AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY \
+talkscribe-api:latest
 ```
 ## GitHub Actions CI/CD
 This project includes a GitHub Actions workflow to build and push the Docker image to Amazon Elastic Container Registry (ECR). <p>
 Workflow location: `.github/workflows/build.yaml`
 
 Workflow Jobs:
-- Build Image — Uses Buildpacks to generate a Docker image from your code
+- Build Image — Uses Buildpacks to generate a Docker image
 - Push to ECR — Pushes the image to AWS ECR
 
 ## API Usage
