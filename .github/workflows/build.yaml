@@ -6,9 +6,9 @@ on:
       - main
 
 jobs:
-  # Build Docker image
   build-image:
-    name: Build Docker Image with Buildpacks
+    # Build Docker Image with Buildpack
+    name: Build Image
     runs-on: ubuntu-latest
 
     steps:
@@ -45,11 +45,10 @@ jobs:
         with:
           name: talkscribe-api-image
           path: talkscribe-api.tar
-          retention-days: 1
 
-  # Push the Docker image to Amazon ECR
   push-to-ecr:
-    name: Push Docker Image to Amazon ECR
+    # Push Docker Image to Amazon ECR
+    name: Push to ECR
     runs-on: ubuntu-latest
     needs: build-image
 

@@ -28,7 +28,7 @@
                 <version>3.4.4</version>
                 <configuration>
                     <image>
-                        <name>talkscribe-api-image</name>
+                        <name>talkscribe-api</name>
                     </image>
                 </configuration>
             </plugin>
