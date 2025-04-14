@@ -1,10 +1,17 @@
 # Talkscribe API
+![Java](https://img.shields.io/badge/Java-17-blue)
+![Docker](https://img.shields.io/badge/dockerized-yes-blue)
+![Build](https://github.com/danijeldragicevic/talkscribe-api/actions/workflows/build.yaml/badge.svg)
+
 ## Overview
-TalkScribe API is a Spring Boot application that provides an API for text-to-speech conversion using AWS Polly.
+TalkScribe API is a Spring Boot application that provides an API for text-to-speech conversion using AWS Polly. <p> 
+It is configured for containerized deployment using [Cloud Native Buildpacks](https://buildpacks.io/).
 
 ## Features
-- Text-to-speech conversion using AWS Polly
-- Supports multiple languages and voices
+- Text-to-speech using AWS Polly
+- Multi-language support
+- Container image built with Buildpacks
+- GitHub Actions pipeline with AWS ECR push
 
 ## Supported languages
 - Arabic
@@ -19,10 +26,14 @@ TalkScribe API is a Spring Boot application that provides an API for text-to-spe
 
 ## Prerequisites
 Ensure you have the following installed and configured:
-- Java 17 or higher
-- Maven 3.9.0 or higher
-- Docker 25.0.8 or higher
-- AWS account with access to Polly service
+- Java 17+
+- Docker 25.0.8+
+- AWS account with access to Polly and Comprehend services
+- GitHub Secrets for deployment:
+  - AWS_ACCESS_KEY_ID 
+  - AWS_SECRET_ACCESS_KEY 
+  - AWS_REGION 
+  - ECR_REPOSITORY_URL
 
 ## Installation & Setup
 Clone the repository:
@@ -30,32 +41,38 @@ Clone the repository:
 git clone https://github.com/danijeldragicevic/talkscribe-api
 cd talkscribe-api
 ```
-Create environment variables for AWS credentials:
+Set up AWS credentials:
 ```commandline
 export AWS_ACCESS_KEY_ID=your-access-key-id
 export AWS_SECRET_ACCESS_KEY=your-secret-access-key
 export AWS_REGION=your-region
 ```
-Build the project:
+Build and run locally:
 ```commandline
-mvn clean install
+./mvnw clean install
+./mvnw spring-boot:run
 ```
-Run the application using Maven:
+### Docker Image with Buildpacks
+Build Docker Image:
 ```commandline
-mvn spring-boot:run
+./mvnw spring-boot:build-image \
+  -Dspring-boot.build-image.imageName=talkscribe-api:latest
 ```
-Run the application using Docker:
+Run Cointainer Locally:
 ```commandline
-docker-compose up --build
+docker run -d -p 8080:8080 \ 
+    -e AWS_REGION=$AWS_REGION \ 
+    -e AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID \ 
+    -e AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY \ 
+    talkscribe-api-image:latest
 ```
-## Deployment
-The project includes a GitHub Actions workflow to build and push the Docker image to Amazon ECR. <p> 
-The workflow is defined in `.github/workflows/build.yaml`.
+## GitHub Actions CI/CD
+This project includes a GitHub Actions workflow to build and push the Docker image to Amazon Elastic Container Registry (ECR). <p>
+Workflow location: `.github/workflows/build.yaml`
 
-Workflow jobs:
-- Build Jar - The workflow builds the JAR file and saves it as an artifact.
-- Build Docker  - The workflow builds the Docker image out of the Jar file.
-- Push to ECR - The Docker image is pushed to Amazon Elastic Container Registry (ECR).
+Workflow Jobs:
+- Build Image — Uses Buildpacks to generate a Docker image from your code
+- Push to ECR — Pushes the image to AWS ECR
 
 ## API Usage
 ### Translate text to speech
@@ -74,7 +91,7 @@ Example Response:
 Http-Status     200 OK
 Content-Type    application/octet-stream
 ---
-ID3#TSSELavf58.76.100��d�)���!�j22��w'wxy4��D�	�߉\���ר��nO�D'�,
+(Binary audio data)
 ```
 ### Get supported languages
 Endpoint: `GET /api/languages` <br>
