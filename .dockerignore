@@ -1,5 +1,0 @@
-target/
-.m2/
-Dockerfile
-.git/
-.gitignore

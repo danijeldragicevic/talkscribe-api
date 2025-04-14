@@ -25,6 +25,12 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+                <version>3.4.4</version>
+                <configuration>
+                    <image>
+                        <name>talkscribe-api-image</name>
+                    </image>
+                </configuration>
             </plugin>
         </plugins>
     </build>

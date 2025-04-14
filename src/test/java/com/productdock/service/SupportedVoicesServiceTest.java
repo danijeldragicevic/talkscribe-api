@@ -53,7 +53,7 @@ public class SupportedVoicesServiceTest {
         assertLanguage(supportedLanguages.get(1), "de", "German", "de-DE", "Vicki");
         assertLanguage(supportedLanguages.get(2), "en", "English (US)", "en-US", "Joanna");
         assertLanguage(supportedLanguages.get(3), "es", "Spanish (Castilian)", "es-ES", "Lucia");
-        assertLanguage(supportedLanguages.get(4), "fr", "France", "fr-FR", "Lea");
+        assertLanguage(supportedLanguages.get(4), "fr", "French", "fr-FR", "Lea");
         assertLanguage(supportedLanguages.get(5), "hi", "Hindi", "hi-IN", "Kajal");
         assertLanguage(supportedLanguages.get(6), "pt", "Portuguese (Brazil)", "pt-BR", "Vitoria");
         assertLanguage(supportedLanguages.get(7), "sv", "Swedish", "sv-SE", "Elin");
