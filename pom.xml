@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.productdock</groupId>
     <artifactId>talkscribe-api</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>1.0.0</version>
     <name>talkscribe-api</name>
     <description>Send text and voice to the AWS Polly and Transcribe services</description>
     <parent>
@@ -19,16 +19,17 @@
         <java.version>17</java.version>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
+        <spring-boot.version>3.4.4</spring-boot.version>
     </properties>
     <build>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
-                <version>3.4.4</version>
+                <version>${spring-boot.version}</version>
                 <configuration>
                     <image>
-                        <name>talkscribe-api</name>
+                        <name>${project.artifactId}:${project.version}</name>
                     </image>
                 </configuration>
             </plugin>

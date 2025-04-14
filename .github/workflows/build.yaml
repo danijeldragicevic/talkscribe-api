@@ -7,9 +7,11 @@ on:
 
 jobs:
   build-image:
-    # Build Docker Image with Buildpack
     name: Build Image
     runs-on: ubuntu-latest
+
+    outputs:
+      version: ${{ steps.extract-version.outputs.version }}
 
     steps:
       - name: Checkout code
@@ -32,13 +34,20 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-maven-
 
+      - name: Extract app version from pom.xml
+        id: extract-version
+        run: |
+          VERSION=$(./mvnw help:evaluate -Dexpression=project.version -q -DforceStdout)
+          echo "App version: $VERSION"
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
       - name: Build Docker image with Spring Boot Buildpacks
         run: |
           ./mvnw spring-boot:build-image \
-            -Dspring-boot.build-image.imageName=talkscribe-api:latest
+            -Dspring-boot.build-image.imageName=talkscribe-api:${{ steps.extract-version.outputs.version }}
 
       - name: Save Docker image as artifact
-        run: docker save -o talkscribe-api.tar talkscribe-api:latest
+        run: docker save -o talkscribe-api.tar talkscribe-api:${{ steps.extract-version.outputs.version }}
 
       - name: Upload Docker image artifact
         uses: actions/upload-artifact@v4
@@ -47,7 +56,6 @@ jobs:
           path: talkscribe-api.tar
 
   push-to-ecr:
-    # Push Docker Image to Amazon ECR
     name: Push to ECR
     runs-on: ubuntu-latest
     needs: build-image
@@ -76,10 +84,14 @@ jobs:
           aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin ${{ secrets.ECR_REPOSITORY_URL }}
 
       - name: Tag Docker image for ECR
-        run: docker tag talkscribe-api:latest ${{ secrets.ECR_REPOSITORY_URL }}:latest
+        run: |
+          VERSION=${{ needs.build-image.outputs.version }}
+          docker tag talkscribe-api:$VERSION ${{ secrets.ECR_REPOSITORY_URL }}:$VERSION
 
       - name: Push Docker image to ECR
-        run: docker push ${{ secrets.ECR_REPOSITORY_URL }}:latest
+        run: |
+          VERSION=${{ needs.build-image.outputs.version }}
+          docker push ${{ secrets.ECR_REPOSITORY_URL }}:$VERSION
 
       - name: Docker Cleanup
         run: docker system prune -af
