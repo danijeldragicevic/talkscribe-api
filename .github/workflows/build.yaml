@@ -11,7 +11,8 @@ jobs:
     runs-on: ubuntu-latest
 
     outputs:
-      version: ${{ steps.extract-version.outputs.version }}
+      version: ${{ steps.extract.outputs.version }}
+      artifactId: ${{ steps.extract.outputs.artifactId }}
 
     steps:
       - name: Checkout code
@@ -34,26 +35,27 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-maven-
 
-      - name: Extract app version from pom.xml
-        id: extract-version
+      - name: Extract artifactId and version from pom.xml
+        id: extract
         run: |
+          ARTIFACT_ID=$(./mvnw help:evaluate -Dexpression=project.artifactId -q -DforceStdout)
           VERSION=$(./mvnw help:evaluate -Dexpression=project.version -q -DforceStdout)
-          echo "App version: $VERSION"
+          echo "artifactId=$ARTIFACT_ID" >> $GITHUB_OUTPUT
           echo "version=$VERSION" >> $GITHUB_OUTPUT
 
       - name: Build Docker image with Spring Boot Buildpacks
-        run: |
-          ./mvnw spring-boot:build-image \
-            -Dspring-boot.build-image.imageName=talkscribe-api:${{ steps.extract-version.outputs.version }}
+        run: ./mvnw spring-boot:build-image
 
       - name: Save Docker image as artifact
-        run: docker save -o talkscribe-api.tar talkscribe-api:${{ steps.extract-version.outputs.version }}
+        run: |
+          docker save -o ${{ steps.extract.outputs.artifactId }}.tar \
+            ${{ steps.extract.outputs.artifactId }}:${{ steps.extract.outputs.version }}
 
       - name: Upload Docker image artifact
         uses: actions/upload-artifact@v4
         with:
-          name: talkscribe-api-image
-          path: talkscribe-api.tar
+          name: ${{ steps.extract.outputs.artifactId }}-image
+          path: ${{ steps.extract.outputs.artifactId }}.tar
 
   push-to-ecr:
     name: Push to ECR
@@ -70,11 +72,11 @@ jobs:
       - name: Download Docker image artifact
         uses: actions/download-artifact@v4
         with:
-          name: talkscribe-api-image
+          name: ${{ needs.build-image.outputs.artifactId }}-image
           path: .
 
       - name: Load Docker image
-        run: docker load -i talkscribe-api.tar
+        run: docker load -i ${{ needs.build-image.outputs.artifactId }}.tar
 
       - name: Log in to Amazon ECR
         run: |
@@ -85,13 +87,12 @@ jobs:
 
       - name: Tag Docker image for ECR
         run: |
-          VERSION=${{ needs.build-image.outputs.version }}
-          docker tag talkscribe-api:$VERSION ${{ secrets.ECR_REPOSITORY_URL }}:$VERSION
+          docker tag ${{ needs.build-image.outputs.artifactId }}:${{ needs.build-image.outputs.version }} \
+            ${{ secrets.ECR_REPOSITORY_URL }}:${{ needs.build-image.outputs.version }}
 
       - name: Push Docker image to ECR
         run: |
-          VERSION=${{ needs.build-image.outputs.version }}
-          docker push ${{ secrets.ECR_REPOSITORY_URL }}:$VERSION
+          docker push ${{ secrets.ECR_REPOSITORY_URL }}:${{ needs.build-image.outputs.version }}
 
       - name: Docker Cleanup
         run: docker system prune -af

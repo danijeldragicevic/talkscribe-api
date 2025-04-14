@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.productdock</groupId>
     <artifactId>talkscribe-api</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.1</version>
     <name>talkscribe-api</name>
     <description>Send text and voice to the AWS Polly and Transcribe services</description>
     <parent>
