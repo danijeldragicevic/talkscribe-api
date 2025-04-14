@@ -43,7 +43,7 @@ public class SupportedVoicesService {
     private static final Map<String, String> LOCALE_TO_LANG_NAME_MAP = Map.of(
             "en-US", "English (US)",
             "de-DE", "German",
-            "fr-FR", "France",
+            "fr-FR", "French",
             "es-ES", "Spanish (Castilian)",
             "sv-SE", "Swedish",
             "cmn-CN", "Mandarin Chinese",
