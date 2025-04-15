@@ -50,14 +50,14 @@ public class SupportedVoicesServiceTest {
 
         // Verify the properties of each supported language
         assertLanguage(supportedLanguages.get(0), "ar", "Arabic", "arb", "Hala");
-        assertLanguage(supportedLanguages.get(1), "de", "German", "de-DE", "Vicki");
-        assertLanguage(supportedLanguages.get(2), "en", "English (US)", "en-US", "Joanna");
-        assertLanguage(supportedLanguages.get(3), "es", "Spanish (Castilian)", "es-ES", "Lucia");
-        assertLanguage(supportedLanguages.get(4), "fr", "French", "fr-FR", "Lea");
-        assertLanguage(supportedLanguages.get(5), "hi", "Hindi", "hi-IN", "Kajal");
+        assertLanguage(supportedLanguages.get(1), "en", "English (US)", "en-US", "Joanna");
+        assertLanguage(supportedLanguages.get(2), "fr", "French", "fr-FR", "Lea");
+        assertLanguage(supportedLanguages.get(3), "de", "German", "de-DE", "Vicki");
+        assertLanguage(supportedLanguages.get(4), "hi", "Hindi", "hi-IN", "Kajal");
+        assertLanguage(supportedLanguages.get(5), "zh", "Mandarin Chinese", "cmn-CN", "Zhiyu");
         assertLanguage(supportedLanguages.get(6), "pt", "Portuguese (Brazil)", "pt-BR", "Vitoria");
-        assertLanguage(supportedLanguages.get(7), "sv", "Swedish", "sv-SE", "Elin");
-        assertLanguage(supportedLanguages.get(8), "zh", "Mandarin Chinese", "cmn-CN", "Zhiyu");
+        assertLanguage(supportedLanguages.get(7), "es", "Spanish (Castilian)", "es-ES", "Lucia");
+        assertLanguage(supportedLanguages.get(8), "sv", "Swedish", "sv-SE", "Elin");
     }
 
     // Helper method to verify voice selection

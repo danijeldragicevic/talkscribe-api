@@ -77,7 +77,7 @@ public class SupportedVoicesService {
             supportedLangauges.add(supportedLangauge);
         }
 
-        // Sort the list by the language code
+        // Sort the list by the language name
         supportedLangauges.sort(new Comparator<SupportedLangauge>() {
             @Override
             public int compare(SupportedLangauge o1, SupportedLangauge o2) {
