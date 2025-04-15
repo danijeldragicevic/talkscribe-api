@@ -81,7 +81,7 @@ public class SupportedVoicesService {
         supportedLangauges.sort(new Comparator<SupportedLangauge>() {
             @Override
             public int compare(SupportedLangauge o1, SupportedLangauge o2) {
-                return o1.getLanguageCode().compareTo(o2.getLanguageCode());
+                return o1.getLanguageName().compareTo(o2.getLanguageName());
             }
         });
 
