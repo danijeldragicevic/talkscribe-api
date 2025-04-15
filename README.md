@@ -1,6 +1,7 @@
 # Talkscribe API
 ![Java](https://img.shields.io/badge/Java-17-blue)
-![Docker](https://img.shields.io/badge/dockerized-yes-blue)
+![AWS SDK](https://img.shields.io/badge/AWS_SDK-2.31.11-blue)
+![Docker](https://img.shields.io/badge/Dockerized-yes-blue)<br>
 ![Build](https://github.com/danijeldragicevic/talkscribe-api/actions/workflows/build.yaml/badge.svg)
 
 ## Overview
