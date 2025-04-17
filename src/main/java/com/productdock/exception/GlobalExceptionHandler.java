@@ -28,6 +28,13 @@ public class GlobalExceptionHandler {
         return buildErrorResponse(exception.getMessage(), HttpStatus.SERVICE_UNAVAILABLE, request);
     }
 
+    /**
+     * Handles ComprehendRepositoryException and returns a 503 Service Unavailable response.
+     *
+     * @param exception the exception thrown by the repository
+     * @param request the web request during which the exception was thrown
+     * @return ResponseEntity with error details and HTTP status code
+     */
     @ExceptionHandler(SpeechToTextServiceException.class)
     public ResponseEntity<ErrorResponse> handleSpeechToTextServiceException(SpeechToTextServiceException exception, WebRequest request) {
         log.error("Handling SpeechToTextServiceException {}", exception.getMessage());
