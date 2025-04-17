@@ -39,6 +39,7 @@ public class S3Repository {
                 .build();
         try {
             s3Client.putObject(putRequest, RequestBody.fromBytes(getBytes(audioFile)));
+
         } catch (S3Exception e) {
             log.error("Error uploading file to S3", e);
             throw new S3RepositoryException("Error uploading file to S3", e);
@@ -62,6 +63,7 @@ public class S3Repository {
                     .bucket(bucketName)
                     .key(s3Key)
                     .build());
+
         } catch (S3Exception e) {
             log.error("Error deleting file from S3", e);
             throw new S3RepositoryException("Error deleting file from S3", e);
@@ -81,10 +83,10 @@ public class S3Repository {
     private byte[] getBytes(MultipartFile audioFile) throws S3RepositoryException {
         try {
             return audioFile.getBytes();
+
         } catch (Exception e) {
             log.error("Error converting file to bytes", e);
             throw new S3RepositoryException("Error converting file to bytes", e);
         }
     }
-
 }

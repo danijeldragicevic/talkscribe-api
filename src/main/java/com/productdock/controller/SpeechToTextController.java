@@ -1,6 +1,5 @@
 package com.productdock.controller;
 
-import com.productdock.exception.SpeechToTextServiceException;
 import com.productdock.service.SpeechToTextService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,17 +18,17 @@ import org.springframework.web.multipart.MultipartFile;
 public class SpeechToTextController {
     private final SpeechToTextService speechToTextService;
 
+    /**
+     * Endpoint to convert audio to text.
+     *
+     * @param audioFile the audio file to be converted
+     * @return ResponseEntity with the converted text and HTTP status code
+     */
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<String> convertAudioToText(@RequestParam("audioFile") MultipartFile audioFile) {
         log.info("Received request to convert audio to text");
 
-        String text = null;
-        try {
-            text = speechToTextService.convertAudioToText(audioFile);
-        } catch (SpeechToTextServiceException e) {
-            throw new RuntimeException(e);
-        }
-
-        return ResponseEntity.ok(text);
+        String text = speechToTextService.convertAudioToText(audioFile);
+        return ResponseEntity.ok().body(text);
     }
 }

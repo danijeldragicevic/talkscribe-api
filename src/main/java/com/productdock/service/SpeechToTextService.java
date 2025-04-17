@@ -25,6 +25,7 @@ public class SpeechToTextService {
          *
          * @param audioFile the audio file to be converted
          * @return  the transcribed text
+         * @throws SpeechToTextServiceException if an error occurs during the conversion
          */
         @Retryable(retryFor = SpeechToTextServiceException.class, maxAttempts = 3, backoff = @Backoff(delay = 1000))
         public String convertAudioToText(MultipartFile audioFile) throws SpeechToTextServiceException {
@@ -39,10 +40,12 @@ public class SpeechToTextService {
             } catch (TranscribeRepositoryException e) {
                 log.error("Failed to transcribe audio file: {}", audioFile.getOriginalFilename(), e);
                 throw new SpeechToTextServiceException("Error transcribing audio file", e);
+
             } finally {
                 if (s3Key != null) {
                     try {
                         s3Repository.deleteAudioFile(s3Key);
+
                     } catch (S3RepositoryException e) {
                         log.error("Failed to delete audio file from S3: {}", s3Key, e);
                     }

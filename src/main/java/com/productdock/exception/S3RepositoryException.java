@@ -1,6 +1,6 @@
 package com.productdock.exception;
 
-public class S3RepositoryException extends Exception {
+public class S3RepositoryException extends RuntimeException {
 
     /**
      * Constructs a new S3RepositoryException with the specified detail message and cause.

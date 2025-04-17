@@ -25,6 +25,13 @@ public class TranscribeRepository {
     @Value("${aws.s3.transcribe.input-bucket}")
     private String bucketName;
 
+    /**
+     * Transcribes audio from an S3 bucket.
+     *
+     * @param s3Key the S3 key of the audio file
+     * @return the transcribed text
+     * @throws TranscribeRepositoryException if an error occurs during transcription
+     */
     public String transcribeFromS3(String s3Key) throws TranscribeRepositoryException {
         String jobName = "job-" + UUID.randomUUID();
 
@@ -37,6 +44,7 @@ public class TranscribeRepository {
         } catch (Exception e) {
             log.error("Error during transcription job for file: {}", s3Key, e);
             throw new TranscribeRepositoryException("Failed to transcribe audio from S3", e);
+
         } finally {
             deleteTranscriptionJob(jobName);
         }

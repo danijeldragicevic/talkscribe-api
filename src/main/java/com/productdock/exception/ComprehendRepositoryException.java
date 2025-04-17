@@ -1,6 +1,6 @@
 package com.productdock.exception;
 
-public class ComprehendRepositoryException extends Exception {
+public class ComprehendRepositoryException extends RuntimeException {
 
     /**
      * Constructs a new ComprehendRepositoryException with the specified detail message and cause.
