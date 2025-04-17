@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 
 @Slf4j
 @ControllerAdvice
-public class GlobalExceptionHandler {
+public class _GlobalExceptionHandler {
 
     /**
      * Handles TextToSpeechServiceException and returns a 503 Service Unavailable response.

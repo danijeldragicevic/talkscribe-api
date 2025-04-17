@@ -1,7 +1,7 @@
 package com.productdock.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.productdock.exception.GlobalExceptionHandler;
+import com.productdock.exception._GlobalExceptionHandler;
 import com.productdock.model.TextToSpeechRequest;
 import com.productdock.service.TextToSpeechService;
 import org.junit.jupiter.api.BeforeEach;
@@ -43,7 +43,7 @@ class TextToSpeechControllerTest {
         Mockito.reset(textToSpeechService);
         mockMvc = MockMvcBuilders
                 .standaloneSetup(textToSpeechController)
-                .setControllerAdvice(new GlobalExceptionHandler())
+                .setControllerAdvice(new _GlobalExceptionHandler())
                 .build();
     }
 

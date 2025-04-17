@@ -18,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.*;
 
 /**
- * Test class for GlobalExceptionHandler.
+ * Test class for _GlobalExceptionHandler.
  */
 @ExtendWith(MockitoExtension.class)
 class GlobalExceptionHandlerTest {
@@ -27,7 +27,7 @@ class GlobalExceptionHandlerTest {
     private WebRequest mockRequest;
 
     @InjectMocks
-    private GlobalExceptionHandler exceptionHandler;
+    private _GlobalExceptionHandler exceptionHandler;
 
     @Test
     void shouldHandleTextToSpeechServiceException() {
