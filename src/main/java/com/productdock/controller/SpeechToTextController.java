@@ -1,5 +1,6 @@
 package com.productdock.controller;
 
+import com.productdock.model.SpeechToTextResponse;
 import com.productdock.service.SpeechToTextService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,11 +25,13 @@ public class SpeechToTextController {
      * @param audioFile the audio file to be converted
      * @return ResponseEntity with the converted text and HTTP status code
      */
-    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<String> convertAudioToText(@RequestParam("audioFile") MultipartFile audioFile) {
+    @PostMapping(
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<SpeechToTextResponse> convertAudioToText(@RequestParam("audioFile") MultipartFile audioFile) {
         log.info("Received request to convert audio to text");
-
         String text = speechToTextService.convertAudioToText(audioFile);
-        return ResponseEntity.ok().body(text);
+
+        return ResponseEntity.ok().body(new SpeechToTextResponse(text));
     }
 }
