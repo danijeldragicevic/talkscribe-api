@@ -20,7 +20,7 @@ import java.util.UUID;
 public class TranscribeRepository {
 
     private final TranscribeClient transcribeClient;
-    private static final int POLL_INTERVAL_MS = 1500;
+    private static final int POLL_INTERVAL_MS = 100;
 
     @Value("${aws.s3.transcribe.input-bucket}")
     private String bucketName;
@@ -31,10 +31,14 @@ public class TranscribeRepository {
         try {
             startTranscriptionJob(jobName, s3Key);
             waitForJobCompletion(jobName);
+
             return fetchTranscript(jobName);
+
         } catch (Exception e) {
             log.error("Error during transcription job for file: {}", s3Key, e);
             throw new TranscribeRepositoryException("Failed to transcribe audio from S3", e);
+        } finally {
+            deleteTranscriptionJob(jobName);
         }
     }
 
@@ -43,13 +47,14 @@ public class TranscribeRepository {
 
         StartTranscriptionJobRequest request = StartTranscriptionJobRequest.builder()
                 .transcriptionJobName(jobName)
-                .languageCode(LanguageCode.EN_US)
-                .mediaFormat("wav")
                 .media(Media.builder().mediaFileUri(mediaUri).build())
+                .mediaFormat("wav")
+                .languageCode(LanguageCode.EN_US)
+                .mediaSampleRateHertz(16000)
                 .build();
 
         transcribeClient.startTranscriptionJob(request);
-        log.info("Started transcription job: {}", jobName);
+        log.debug("Started transcription job: {}", jobName);
     }
 
     private void waitForJobCompletion(String jobName) throws InterruptedException, TranscribeRepositoryException {
@@ -62,7 +67,7 @@ public class TranscribeRepository {
             TranscriptionJobStatus status = job.transcriptionJobStatus();
 
             if (status == TranscriptionJobStatus.COMPLETED) {
-                log.info("Transcription job completed: {}", jobName);
+                log.debug("Transcription job completed: {}", jobName);
                 return;
             }
 
@@ -90,5 +95,12 @@ public class TranscribeRepository {
             log.error("Failed to fetch or parse transcript for job: {}", jobName, e);
             throw new TranscribeRepositoryException("Failed to fetch transcript from URI", e);
         }
+    }
+
+    private void deleteTranscriptionJob(String jobName) {
+        transcribeClient.deleteTranscriptionJob(
+                DeleteTranscriptionJobRequest.builder().transcriptionJobName(jobName).build()
+        );
+        log.debug("Deleted transcription job: {}", jobName);
     }
 }
