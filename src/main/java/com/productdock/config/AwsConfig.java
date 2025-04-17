@@ -7,10 +7,9 @@ import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.comprehend.ComprehendClient;
 import software.amazon.awssdk.services.polly.PollyClient;
+import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.transcribe.TranscribeClient;
 
-/**
- * Configuration class for AWS services.
- */
 @Configuration
 public class AwsConfig {
 
@@ -44,6 +43,38 @@ public class AwsConfig {
     @Bean
     public ComprehendClient comprehendClient() {
         return ComprehendClient.builder()
+                .region(Region.of(awsRegion))
+                .credentialsProvider(DefaultCredentialsProvider.create())
+                .build();
+    }
+
+    /**
+     * Creates a TranscribeClient bean.
+     * <p>
+     * The client will be configured with the specified region and will automatically fetch
+     * login credentials from the associated IAM role.
+     *
+     * @return TranscribeClient configured with the specified region and default credentials.
+     */
+    @Bean
+    public TranscribeClient transcribeClient() {
+        return TranscribeClient.builder()
+                .region(Region.of(awsRegion))
+                .credentialsProvider(DefaultCredentialsProvider.create())
+                .build();
+    }
+
+    /**
+     * Creates a S3Client bean.
+     * <p>
+     * The client will be configured with the specified region and will automatically fetch
+     * login credentials from the associated IAM role.
+     *
+     * @return S3Client configured with the specified region and default credentials.
+     */
+    @Bean
+    public S3Client s3Client() {
+        return S3Client.builder()
                 .region(Region.of(awsRegion))
                 .credentialsProvider(DefaultCredentialsProvider.create())
                 .build();

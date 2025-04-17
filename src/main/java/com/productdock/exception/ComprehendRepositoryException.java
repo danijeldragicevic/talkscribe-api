@@ -1,8 +1,5 @@
 package com.productdock.exception;
 
-/**
- * Custom exception for handling errors in the Comprehend repository.
- */
 public class ComprehendRepositoryException extends Exception {
 
     /**

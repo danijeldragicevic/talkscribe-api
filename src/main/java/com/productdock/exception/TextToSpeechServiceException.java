@@ -1,8 +1,5 @@
 package com.productdock.exception;
 
-/**
- * Custom exception for handling errors in the text-to-speech service.
- */
 public class TextToSpeechServiceException extends RuntimeException {
 
     /**

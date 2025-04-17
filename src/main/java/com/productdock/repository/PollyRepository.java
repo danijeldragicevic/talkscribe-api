@@ -9,9 +9,6 @@ import software.amazon.awssdk.services.polly.model.*;
 
 import java.io.InputStream;
 
-/**
- * Repository for converting text to speech using AWS Polly.
- */
 @Slf4j
 @Repository
 @RequiredArgsConstructor

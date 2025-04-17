@@ -6,10 +6,12 @@ server.port: 8080
 
 # AWS configuration
 aws.region: ${AWS_REGION}
+# TODO remove default value for this bucket
+aws.s3.transcribe.input-bucket: ${AWS_S3_TRANSCRIBE_INPUT_BUCKET:input-bucket-for-tts-conversion}
 
 # Logging level
 logging.level.org.springframework: INFO
-logging.level.com.productdock: DEBUG
+logging.level.com.productdock: INFO
 
 # Enable throwing NoHandlerFoundException for non-existing endpoints
 spring.mvc.throw-exception-if-no-handler-found: true

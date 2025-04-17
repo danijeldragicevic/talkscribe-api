@@ -11,9 +11,6 @@ import org.springframework.web.context.request.WebRequest;
 
 import java.time.LocalDateTime;
 
-/**
- * Global exception handler for handling exceptions in the application.
- */
 @Slf4j
 @ControllerAdvice
 public class GlobalExceptionHandler {
@@ -28,6 +25,12 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(TextToSpeechServiceException.class)
     public ResponseEntity<ErrorResponse> handleTextToSpeechServiceException(TextToSpeechServiceException exception, WebRequest request) {
         log.error("Handling TextToSpeechServiceException {}", exception.getMessage());
+        return buildErrorResponse(exception.getMessage(), HttpStatus.SERVICE_UNAVAILABLE, request);
+    }
+
+    @ExceptionHandler(SpeechToTextServiceException.class)
+    public ResponseEntity<ErrorResponse> handleSpeechToTextServiceException(SpeechToTextServiceException exception, WebRequest request) {
+        log.error("Handling SpeechToTextServiceException {}", exception.getMessage());
         return buildErrorResponse(exception.getMessage(), HttpStatus.SERVICE_UNAVAILABLE, request);
     }
 

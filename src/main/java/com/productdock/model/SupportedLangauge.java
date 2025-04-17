@@ -4,9 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-/**
- * Model class representing supported languages for text-to-speech conversion.
- */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

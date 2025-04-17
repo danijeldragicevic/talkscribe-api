@@ -16,9 +16,6 @@ import org.springframework.stereotype.Service;
 
 import java.io.InputStream;
 
-/**
- * Service class for handling text-to-speech conversion.
- */
 @Slf4j
 @Service
 @RequiredArgsConstructor

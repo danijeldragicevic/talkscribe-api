@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.productdock</groupId>
     <artifactId>talkscribe-api</artifactId>
-    <version>1.0.1</version>
+    <version>1.0.2</version>
     <name>talkscribe-api</name>
     <description>Send text and voice to the AWS Polly and Transcribe services</description>
     <parent>
@@ -56,6 +56,15 @@
         <dependency>
             <groupId>software.amazon.awssdk</groupId>
             <artifactId>comprehend</artifactId>
+        </dependency>
+        <!-- AWS SDK for Transcribe Service -->
+        <dependency>
+            <groupId>software.amazon.awssdk</groupId>
+            <artifactId>transcribe</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>software.amazon.awssdk</groupId>
+            <artifactId>s3</artifactId>
         </dependency>
         <!-- Spring Boot Web (REST API) -->
         <dependency>

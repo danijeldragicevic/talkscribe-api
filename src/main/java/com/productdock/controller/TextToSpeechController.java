@@ -14,9 +14,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-/**
-* Rest controller for handling text-to-speech requests.
- */
 @Slf4j
 @RestController
 @RequiredArgsConstructor
