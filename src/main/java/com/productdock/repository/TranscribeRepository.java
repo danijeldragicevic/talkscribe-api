@@ -20,7 +20,7 @@ import java.util.UUID;
 public class TranscribeRepository {
 
     private final TranscribeClient transcribeClient;
-    private static final int POLL_INTERVAL_MS = 100;
+    private static final int POLL_INTERVAL_MS = 500;
 
     @Value("${aws.s3.transcribe.input-bucket}")
     private String bucketName;
@@ -34,7 +34,6 @@ public class TranscribeRepository {
      */
     public String transcribeFromS3(String s3Key) throws TranscribeRepositoryException {
         String jobName = "job-" + UUID.randomUUID();
-
         try {
             startTranscriptionJob(jobName, s3Key);
             waitForJobCompletion(jobName);
@@ -44,7 +43,6 @@ public class TranscribeRepository {
         } catch (Exception e) {
             log.error("Error during transcription job for file: {}", s3Key, e);
             throw new TranscribeRepositoryException("Failed to transcribe audio from S3", e);
-
         } finally {
             deleteTranscriptionJob(jobName);
         }
@@ -62,7 +60,6 @@ public class TranscribeRepository {
                 .build();
 
         transcribeClient.startTranscriptionJob(request);
-        log.debug("Started transcription job: {}", jobName);
     }
 
     private void waitForJobCompletion(String jobName) throws InterruptedException, TranscribeRepositoryException {
@@ -75,14 +72,11 @@ public class TranscribeRepository {
             TranscriptionJobStatus status = job.transcriptionJobStatus();
 
             if (status == TranscriptionJobStatus.COMPLETED) {
-                log.debug("Transcription job completed: {}", jobName);
                 return;
             }
-
             if (status == TranscriptionJobStatus.FAILED) {
                 throw new TranscribeRepositoryException("Transcription job failed: " + job.failureReason());
             }
-
             Thread.sleep(POLL_INTERVAL_MS);
         }
     }
@@ -93,12 +87,12 @@ public class TranscribeRepository {
         );
 
         String transcriptUri = response.transcriptionJob().transcript().transcriptFileUri();
-        log.debug("Transcript file URI: {}", transcriptUri);
-
         try (InputStream stream = new URL(transcriptUri).openStream()) {
             ObjectMapper mapper = new ObjectMapper();
             JsonNode json = mapper.readTree(stream);
+
             return json.path("results").path("transcripts").get(0).path("transcript").asText();
+
         } catch (Exception e) {
             log.error("Failed to fetch or parse transcript for job: {}", jobName, e);
             throw new TranscribeRepositoryException("Failed to fetch transcript from URI", e);
@@ -109,6 +103,5 @@ public class TranscribeRepository {
         transcribeClient.deleteTranscriptionJob(
                 DeleteTranscriptionJobRequest.builder().transcriptionJobName(jobName).build()
         );
-        log.debug("Deleted transcription job: {}", jobName);
     }
 }
