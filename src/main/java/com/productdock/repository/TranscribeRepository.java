@@ -54,9 +54,7 @@ public class TranscribeRepository {
         StartTranscriptionJobRequest request = StartTranscriptionJobRequest.builder()
                 .transcriptionJobName(jobName)
                 .media(Media.builder().mediaFileUri(mediaUri).build())
-                .mediaFormat("wav")
                 .languageCode(LanguageCode.EN_US)
-                .mediaSampleRateHertz(16000)
                 .build();
 
         transcribeClient.startTranscriptionJob(request);
