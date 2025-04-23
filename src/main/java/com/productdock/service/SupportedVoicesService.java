@@ -20,7 +20,7 @@ public class SupportedVoicesService {
             "fr", "fr-FR",
             "es", "es-ES",
             "sv", "sv-SE",
-            "pt", "pt-BR"
+            "pt", "pt-PT"
     );
 
     // Map Polly locale codes → Polly voice IDs
@@ -30,17 +30,17 @@ public class SupportedVoicesService {
             "fr-FR", "Lea",
             "es-ES", "Lucia",
             "sv-SE", "Elin",
-            "pt-BR", "Vitoria"
+            "pt-PT", "Ines"
     );
 
     // Map Polly locale codes → Language names
     private static final Map<String, String> LOCALE_TO_LANG_NAME_MAP = Map.of(
-            "en-US", "English (US)",
+            "en-US", "English",
             "de-DE", "German",
             "fr-FR", "French",
-            "es-ES", "Spanish (Castilian)",
+            "es-ES", "Spanish",
             "sv-SE", "Swedish",
-            "pt-BR", "Portuguese (Brazil)"
+            "pt-PT", "Portuguese"
     );
 
     /**

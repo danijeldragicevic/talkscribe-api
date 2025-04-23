@@ -54,7 +54,14 @@ public class TranscribeRepository {
         StartTranscriptionJobRequest request = StartTranscriptionJobRequest.builder()
                 .transcriptionJobName(jobName)
                 .media(Media.builder().mediaFileUri(mediaUri).build())
-                .languageCode(LanguageCode.EN_US)
+                .identifyLanguage(true)
+                .languageOptions(
+                        LanguageCode.EN_US,
+                        LanguageCode.DE_DE,
+                        LanguageCode.FR_FR,
+                        LanguageCode.ES_ES,
+                        LanguageCode.SV_SE,
+                        LanguageCode.PT_PT)
                 .build();
 
         transcribeClient.startTranscriptionJob(request);
