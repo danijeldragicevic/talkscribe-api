@@ -12,7 +12,7 @@ public class CorsConfig {
     /**
      * Configures CORS settings for the application.
      * <p>
-     * This method allows cross-origin requests from any origin to the "/api/**" endpoints
+     * This method allows cross-origin requests from the frontend app to the "/api/**" endpoints
      * with GET and POST methods.
      *
      * @return a WebMvcConfigurer instance with CORS configuration.
