@@ -23,8 +23,7 @@ public class CorsConfig {
             @Override
             public void addCorsMappings(@NotNull CorsRegistry registry) {
                 registry.addMapping("/api/**")
-                        //TODO Change to specific origins in production "https://my-app.s3.amazonaws.com"
-                        .allowedOrigins("*")
+                        .allowedOrigins("http://talkscribe.org")
                         .allowedMethods("GET", "POST");
             }
         };
