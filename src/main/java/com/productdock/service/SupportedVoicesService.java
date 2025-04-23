@@ -20,9 +20,6 @@ public class SupportedVoicesService {
             "fr", "fr-FR",
             "es", "es-ES",
             "sv", "sv-SE",
-            "zh", "cmn-CN",
-            "ar", "arb",
-            "hi", "hi-IN",
             "pt", "pt-BR"
     );
 
@@ -33,9 +30,6 @@ public class SupportedVoicesService {
             "fr-FR", "Lea",
             "es-ES", "Lucia",
             "sv-SE", "Elin",
-            "cmn-CN", "Zhiyu",
-            "arb", "Hala",
-            "hi-IN", "Kajal",
             "pt-BR", "Vitoria"
     );
 
@@ -46,9 +40,6 @@ public class SupportedVoicesService {
             "fr-FR", "French",
             "es-ES", "Spanish (Castilian)",
             "sv-SE", "Swedish",
-            "cmn-CN", "Mandarin Chinese",
-            "arb", "Arabic",
-            "hi-IN", "Hindi",
             "pt-BR", "Portuguese (Brazil)"
     );
 
