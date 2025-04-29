@@ -66,6 +66,20 @@ Workflow Jobs:
 - Build Image — Uses Buildpacks to generate a Docker image
 - Push to ECR — Pushes the image to AWS ECR
 
+## AWS Permissions
+To ensure the application functions correctly, the following permissions must be configured on the user's AWS account.
+
+### Required Role
+Create a role (e.g., `talkscribe-task-role`) with the following permissions:
+
+1. **AmazonPolly**: Full access
+2. **AmazonTranscribe**: Full access
+3. **AmazonComprehend**: Full access
+4. **AmazonCloudWatch**: Full access
+5. **Amazon S3**: Full access to your  `AWS_S3_TRANSCRIBE_INPUT_BUCKET`
+
+Ensure the role is attached to the resources or services interacting with this application.
+
 ## API Usage
 ### Get supported languages
 Endpoint: `GET /api/languages` <br>
