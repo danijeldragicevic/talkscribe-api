@@ -6,7 +6,7 @@ server.port: 8080
 
 # AWS configuration
 aws.region: ${AWS_REGION}
-aws.s3.transcribe.input-bucket: ${AWS_S3_TRANSCRIBE_INPUT_BUCKET:input-bucket-for-tts-conversion}
+aws.s3.transcribe.input-bucket: ${AWS_S3_TRANSCRIBE_INPUT_BUCKET}
 
 # Logging level
 logging.level.org.springframework: INFO

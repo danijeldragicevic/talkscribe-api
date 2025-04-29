@@ -38,6 +38,7 @@ Set up AWS credentials:
 export AWS_ACCESS_KEY_ID=your-access-key-id
 export AWS_SECRET_ACCESS_KEY=your-secret-access-key
 export AWS_REGION=your-region
+export AWS_S3_TRANSCRIBE_INPUT_BUCKET=your-s3-bucket-name
 ```
 Build and run locally:
 ```commandline
@@ -56,6 +57,7 @@ docker run -d --name talkscribe-api \
 -e AWS_REGION=$AWS_REGION \
 -e AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID \
 -e AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY \
+-e AWS_S3_TRANSCRIBE_INPUT_BUCKET=$AWS_S3_TRANSCRIBE_INPUT_BUCKET \
 talkscribe-api:image_version
 ```
 ## GitHub Actions CI/CD
