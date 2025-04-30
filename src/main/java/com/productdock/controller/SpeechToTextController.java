@@ -1,6 +1,7 @@
 package com.productdock.controller;
 
 import com.productdock.model.SpeechToTextResponse;
+import com.productdock.security.RateLimited;
 import com.productdock.service.SpeechToTextService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,6 +26,7 @@ public class SpeechToTextController {
      * @param audioFile the audio file to be converted
      * @return ResponseEntity with the converted text and HTTP status code
      */
+    @RateLimited(requests = 10, durationMinutes = 1)
     @PostMapping(
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)

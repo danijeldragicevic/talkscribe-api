@@ -19,39 +19,52 @@ public class _GlobalExceptionHandler {
     /**
      * Handles MaxUploadSizeExceededException and returns a 413 Payload Too Large.
      *
-     * @param exception the exception thrown by the repository
-     * @param request the web request during which the exception was thrown
+     * @param exception the exception thrown
+     * @param request the request during which the exception was thrown
      * @return ResponseEntity with error details and HTTP status code
      */
     @ExceptionHandler(MaxUploadSizeExceededException.class)
     public ResponseEntity<ErrorResponse> handleMaxUploadSizeExceededException(MaxUploadSizeExceededException exception, WebRequest request) {
-        log.error("Handling MaxUploadSizeExceededException {}", exception.getMessage());
+        log.error("Handling MaxUploadSizeExceededException: {}", exception.getMessage());
         return buildErrorResponse(exception.getMessage(), HttpStatus.PAYLOAD_TOO_LARGE, request);
+    }
+
+    /**
+     * Handles TooManyRequestsException and returns a 429 Too Many Requests response.
+     *
+     * @param exception the exception thrown
+     * @param request the request during which the exception was thrown
+     * @return ResponseEntity with error details and HTTP status code
+     */
+    @ExceptionHandler(TooManyRequestsException.class)
+    public ResponseEntity<ErrorResponse> handleTooManyRequestsException(TooManyRequestsException exception, WebRequest request) {
+        log.error("Handling TooManyRequestsException: {}", exception.getMessage());
+        return buildErrorResponse(exception.getMessage(), HttpStatus.TOO_MANY_REQUESTS, request);
     }
 
     /**
      * Handles TextToSpeechServiceException and returns a 503 Service Unavailable response.
      *
-     * @param exception the exception thrown by the repository
-     * @param request the web request during which the exception was thrown
+     * @param exception the exception thrown
+     * @param request the request during which the exception was thrown
      * @return ResponseEntity with error details and HTTP status code
      */
     @ExceptionHandler(TextToSpeechServiceException.class)
     public ResponseEntity<ErrorResponse> handleTextToSpeechServiceException(TextToSpeechServiceException exception, WebRequest request) {
-        log.error("Handling TextToSpeechServiceException {}", exception.getMessage());
+        log.error("Handling TextToSpeechServiceException: {}", exception.getMessage());
         return buildErrorResponse(exception.getMessage(), HttpStatus.SERVICE_UNAVAILABLE, request);
     }
 
     /**
      * Handles ComprehendRepositoryException and returns a 503 Service Unavailable response.
      *
-     * @param exception the exception thrown by the repository
-     * @param request the web request during which the exception was thrown
+     * @param exception the exception thrown
+     * @param request the request during which the exception was thrown
      * @return ResponseEntity with error details and HTTP status code
      */
     @ExceptionHandler(SpeechToTextServiceException.class)
     public ResponseEntity<ErrorResponse> handleSpeechToTextServiceException(SpeechToTextServiceException exception, WebRequest request) {
-        log.error("Handling SpeechToTextServiceException {}", exception.getMessage());
+        log.error("Handling SpeechToTextServiceException: {}", exception.getMessage());
         return buildErrorResponse(exception.getMessage(), HttpStatus.SERVICE_UNAVAILABLE, request);
     }
 

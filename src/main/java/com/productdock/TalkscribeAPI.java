@@ -5,6 +5,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.retry.annotation.EnableRetry;
 
 @Slf4j
@@ -12,6 +13,7 @@ import org.springframework.retry.annotation.EnableRetry;
 @EnableRetry
 @EnableCaching
 @SpringBootApplication
+@EnableAspectJAutoProxy
 public class TalkscribeAPI {
 
     public static void main(String[] args) {

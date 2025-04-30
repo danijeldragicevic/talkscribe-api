@@ -1,6 +1,7 @@
 package com.productdock.controller;
 
 import com.productdock.model.TextToSpeechRequest;
+import com.productdock.security.RateLimited;
 import com.productdock.service.TextToSpeechService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +28,7 @@ public class TextToSpeechController {
      * @param request the text-to-speech request containing the text to be converted
      * @return ResponseEntity with the audio stream and HTTP status code
      */
+    @RateLimited(requests = 20, durationMinutes = 1)
     @PostMapping(
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
