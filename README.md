@@ -5,8 +5,8 @@
 ![Build](https://github.com/danijeldragicevic/talkscribe-api/actions/workflows/build.yaml/badge.svg)
 
 ## Overview
-TalkScribe API is a Spring Boot application that provides an API for text-to-speech and speech-to-text conversion using AWS Polly and Transcribe. <p> 
-It is configured for containerized deployment using [Cloud Native Buildpacks](https://buildpacks.io/).
+TalkScribe API is a Spring Boot application that provides an API for text-to-speech and speech-to-text conversion using AWS Polly and Transcribe. <br> 
+You can test and interact with this API through the frontend application available at [https://talkscribe.org/](https://talkscribe.org/).
 
 ## Features
 - Text-to-speech using AWS Polly
@@ -148,17 +148,6 @@ Content-Type    application/octet-stream
 ### Error Handling
 The application provides meaningful error responses, for example:
 ```commandline
-Http-Status     404 Not Found
-Content-Type    application/json
----
-{
-    "timestamp": "2025-04-03T14:16:25.997+00:00",
-    "status": 404,
-    "error": "Not Found",
-    "path": "/api/invalid-endpoint"
-}
-```
-```commandline
 Http-Status     413 Payload Too Large
 Content-Type    application/json
 ---
@@ -170,6 +159,18 @@ Content-Type    application/json
 }
 ```
 ```commandline
+Http-Status     429 Too Many Requests
+Content-Type    application/json
+---
+{
+    "timestamp": "2025-04-30T10:17:06.948951",
+    "status": 429,
+    "error": "Too many requests from IP: 127.0.0.1",
+    "path": "/api/speech-to-text"
+}
+```
+
+```commandline
 Http-Status     503 Service Unavailable
 Content-Type    application/json
 ---
@@ -177,7 +178,7 @@ Content-Type    application/json
     "timestamp": "2025-04-03T14:18:32.184467",
     "status": 503,
     "error": "Error processing text-to-speech request",
-    "path": "/api/text-to-speech"
+    "path": "/api/speech-to-text"
 }
 ```
 ## Contributing
