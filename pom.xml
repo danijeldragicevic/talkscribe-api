@@ -76,12 +76,7 @@
             <groupId>org.springframework.retry</groupId>
             <artifactId>spring-retry</artifactId>
         </dependency>
-        <!-- Enable Spring AOP (required for Spring Retry) TODO check do I need this dependency and what is the difference with the next AOP's one -->
-        <dependency>
-            <groupId>org.aspectj</groupId>
-            <artifactId>aspectjweaver</artifactId>
-        </dependency>
-        <!-- Enables Aspect-Oriented Programming (AOP) in Spring Boot applications -->
+        <!-- Enables Spring AOP (required for rate limiting -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-aop</artifactId>
