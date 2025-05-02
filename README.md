@@ -5,8 +5,7 @@
 ![Build](https://github.com/danijeldragicevic/talkscribe-api/actions/workflows/build.yaml/badge.svg)
 
 ## Overview
-TalkScribe API is a Spring Boot application that provides an API for text-to-speech and speech-to-text conversion using AWS Polly and Transcribe. <br> 
-You can test and interact with this API through the frontend application available at [https://talkscribe.org/](https://talkscribe.org/).
+TalkScribe API is a Spring Boot application that provides an API for text-to-speech and speech-to-text conversion using AWS Polly and Transcribe. You can test and interact with this API through the frontend application available at [https://talkscribe.org/](https://talkscribe.org/).
 
 ## Features
 - Text-to-speech using AWS Polly
