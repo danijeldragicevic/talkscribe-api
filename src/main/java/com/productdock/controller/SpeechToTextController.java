@@ -1,16 +1,13 @@
 package com.productdock.controller;
 
-import com.productdock.model.SpeechToTextResponse;
+import com.productdock.model.TranscriptionJobResponse;
 import com.productdock.security.RateLimited;
 import com.productdock.service.SpeechToTextService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 @Slf4j
@@ -18,22 +15,42 @@ import org.springframework.web.multipart.MultipartFile;
 @RequiredArgsConstructor
 @RequestMapping("/api/speech-to-text")
 public class SpeechToTextController {
+
     private final SpeechToTextService speechToTextService;
 
     /**
-     * Endpoint to convert audio to text.
+     * Starts a transcription job for the provided audio file.
      *
      * @param audioFile the audio file to be converted
      * @return ResponseEntity with the converted text and HTTP status code
      */
-    @RateLimited(requests = 10, durationMinutes = 1)
+    @RateLimited(requests = 20, durationMinutes = 1)
     @PostMapping(
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<SpeechToTextResponse> convertAudioToText(@RequestParam("audioFile") MultipartFile audioFile) {
-        log.info("Received request to convert audio to text");
-        String text = speechToTextService.convertAudioToText(audioFile);
+    public ResponseEntity<TranscriptionJobResponse> convertAudioToText(@RequestParam("audioFile") MultipartFile audioFile) {
+        log.info("Received request to start transcription job");
+        if (audioFile.isEmpty()) {
+            return ResponseEntity.badRequest()
+                    .body(new TranscriptionJobResponse(null, "ERROR", "File is empty"));
+        }
+        TranscriptionJobResponse response = speechToTextService.startTranscriptionJob(audioFile);
+        return ResponseEntity.ok(response);
+    }
 
-        return ResponseEntity.ok().body(new SpeechToTextResponse(text));
+    /**
+     * Checks the status of a transcription job and returns the transcript if completed.
+     *
+     * @param jobName the transcription job name
+     * @return job status and optionally transcript
+     */
+    @RateLimited(requests = 20, durationMinutes = 1)
+    @GetMapping(
+            path = "/status/{jobName}",
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<TranscriptionJobResponse> getJobStatus(@PathVariable String jobName) {
+        log.info("Checking status for job: {}", jobName);
+        TranscriptionJobResponse response = speechToTextService.getTranscriptionJobStatus(jobName);
+        return ResponseEntity.ok(response);
     }
 }

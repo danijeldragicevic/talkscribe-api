@@ -3,13 +3,11 @@ package com.productdock.service;
 import com.productdock.exception.S3RepositoryException;
 import com.productdock.exception.SpeechToTextServiceException;
 import com.productdock.exception.TranscribeRepositoryException;
+import com.productdock.model.TranscriptionJobResponse;
 import com.productdock.repository.S3Repository;
 import com.productdock.repository.TranscribeRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.retry.annotation.Backoff;
-import org.springframework.retry.annotation.Recover;
-import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -17,46 +15,48 @@ import org.springframework.web.multipart.MultipartFile;
 @Service
 @RequiredArgsConstructor
 public class SpeechToTextService {
-        private final S3Repository s3Repository;
-        private final TranscribeRepository transcribeRepository;
 
-        /**
-         * Converts a speech audio file to text.
-         *
-         * @param audioFile the audio file to be converted
-         * @return  the transcribed text
-         * @throws SpeechToTextServiceException if an error occurs during the conversion
-         */
-        @Retryable(retryFor = SpeechToTextServiceException.class, maxAttempts = 3, backoff = @Backoff(delay = 1000))
-        public String convertAudioToText(MultipartFile audioFile) throws SpeechToTextServiceException {
-            String s3Key = null;
-            try {
-                s3Key = s3Repository.uploadAudioFile(audioFile);
-                return transcribeRepository.transcribeFromS3(s3Key);
+    private final S3Repository s3Repository;
+    private final TranscribeRepository transcribeRepository;
 
-            } catch (S3RepositoryException e) {
-                log.error("Failed to upload audio file to S3: {}", audioFile.getOriginalFilename(), e);
-                throw new SpeechToTextServiceException("Error uploading audio file to S3", e);
-            } catch (TranscribeRepositoryException e) {
-                log.error("Failed to transcribe audio file: {}", audioFile.getOriginalFilename(), e);
-                throw new SpeechToTextServiceException("Error transcribing audio file", e);
-            } finally {
-                if (s3Key != null) {
-                    try {
-                        s3Repository.deleteAudioFile(s3Key);
-                    } catch (S3RepositoryException e) {
-                        log.error("Failed to delete audio file from S3: {}", s3Key, e);
-                    }
-                }
+    //TODO should I introduce Retry mechanism here?
+
+    /**
+     * Starts a transcription job and returns the job name and initial status.
+     */
+    public TranscriptionJobResponse startTranscriptionJob(MultipartFile audioFile) {
+        try {
+            String s3Key = s3Repository.uploadAudioFile(audioFile);
+            String jobName = transcribeRepository.startTranscriptionJob(s3Key);
+
+            return new TranscriptionJobResponse(jobName, "IN_PROGRESS", null);
+        } catch (S3RepositoryException | TranscribeRepositoryException e) {
+            log.error("Failed to initiate transcription job", e);
+            throw new SpeechToTextServiceException("Failed to start transcription job", e);
+        }
+    }
+
+    /**
+     * Checks the status of the transcription job and fetches transcript if done.
+     */
+    public TranscriptionJobResponse getTranscriptionJobStatus(String jobName) {
+        try {
+            String status = transcribeRepository.getJobStatus(jobName);
+            String transcript = null;
+
+            if ("COMPLETED".equals(status)) {
+                transcript = transcribeRepository.fetchTranscript(jobName);
+
+                // Cleanup only after job is done:
+                //transcribeRepository.deleteTranscriptionJob(jobName);
+                //transcribeRepository.deleteAudioFileForJob(jobName); // we’ll add this helper
             }
-        }
 
-        /**
-         * Fallback method triggered when all retry attempts fail.
-         */
-        @Recover
-        public String handleRetriesFailure(SpeechToTextServiceException e, MultipartFile audioFile) throws SpeechToTextServiceException {
-            log.error("All retry attempts failed for audio file: {}", audioFile.getOriginalFilename(), e);
-            throw e;
+            return new TranscriptionJobResponse(jobName, status, transcript);
+
+        } catch (TranscribeRepositoryException | S3RepositoryException e) {
+            log.error("Error checking job status or fetching result for job: {}", jobName, e);
+            throw new SpeechToTextServiceException("Failed to check job status or fetch transcript", e);
         }
+    }
 }

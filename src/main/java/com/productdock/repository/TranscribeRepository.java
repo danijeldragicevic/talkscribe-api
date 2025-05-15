@@ -3,6 +3,7 @@ package com.productdock.repository;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.productdock.exception.TranscribeRepositoryException;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -12,7 +13,9 @@ import software.amazon.awssdk.services.transcribe.model.*;
 
 import java.io.InputStream;
 import java.net.URL;
+import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Slf4j
 @Repository
@@ -20,40 +23,33 @@ import java.util.UUID;
 public class TranscribeRepository {
 
     private final TranscribeClient transcribeClient;
-    private static final int POLL_INTERVAL_MS = 500;
+    private final S3Repository s3Repository;
+    private final ObjectMapper objectMapper;
+
+    // Maps job name -> S3 key (needed for cleanup later)
+    private final Map<String, String> jobToS3KeyMap = new ConcurrentHashMap<>();
 
     @Value("${aws.s3.transcribe.input-bucket}")
     private String bucketName;
 
-    /**
-     * Transcribes audio from an S3 bucket.
-     *
-     * @param s3Key the S3 key of the audio file
-     * @return the transcribed text
-     * @throws TranscribeRepositoryException if an error occurs during transcription
-     */
-    public String transcribeFromS3(String s3Key) throws TranscribeRepositoryException {
-        String jobName = "job-" + UUID.randomUUID();
-        try {
-            startTranscriptionJob(jobName, s3Key);
-            waitForJobCompletion(jobName);
-
-            return fetchTranscript(jobName);
-        } catch (Exception e) {
-            log.error("Error during transcription job for file: {}", s3Key, e);
-            throw new TranscribeRepositoryException("Failed to transcribe audio from S3", e);
-        } finally {
-            deleteTranscriptionJob(jobName);
-        }
+    @PostConstruct
+    public void init() {
+        log.info("TranscribeRepository initialized with bucket '{}'", bucketName);
     }
 
-    private void startTranscriptionJob(String jobName, String s3Key) {
-        String mediaUri = String.format("https://%s.s3.amazonaws.com/%s", bucketName, s3Key);
+    //TODO add comments to all methods
+
+    public String startTranscriptionJob(String s3Key) throws TranscribeRepositoryException {
+        String jobName = "job-" + UUID.randomUUID();
+
+        Media media = Media.builder()
+                .mediaFileUri("s3://" + bucketName + "/" + s3Key)
+                .build();
 
         StartTranscriptionJobRequest request = StartTranscriptionJobRequest.builder()
                 .transcriptionJobName(jobName)
-                .media(Media.builder().mediaFileUri(mediaUri).build())
                 .mediaFormat(MediaFormat.MP3)
+                .media(media)
                 .identifyLanguage(true)
                 .languageOptions(
                         LanguageCode.EN_US,
@@ -61,52 +57,78 @@ public class TranscribeRepository {
                         LanguageCode.FR_FR,
                         LanguageCode.ES_ES,
                         LanguageCode.SV_SE,
-                        LanguageCode.PT_PT)
+                        LanguageCode.PT_PT
+                )
                 .build();
 
-        transcribeClient.startTranscriptionJob(request);
+        try {
+            transcribeClient.startTranscriptionJob(request);
+            jobToS3KeyMap.put(jobName, s3Key);
+            return jobName;
+
+        } catch (TranscribeException e) {
+            log.error("Failed to start transcription job", e);
+            throw new TranscribeRepositoryException("Failed to start transcription job", e);
+        }
     }
 
-    private void waitForJobCompletion(String jobName) throws InterruptedException, TranscribeRepositoryException {
-        while (true) {
+    public String getJobStatus(String jobName) throws TranscribeRepositoryException {
+        try {
             GetTranscriptionJobResponse response = transcribeClient.getTranscriptionJob(
-                    GetTranscriptionJobRequest.builder().transcriptionJobName(jobName).build()
+                    GetTranscriptionJobRequest.builder()
+                            .transcriptionJobName(jobName)
+                            .build()
             );
 
-            TranscriptionJob job = response.transcriptionJob();
-            TranscriptionJobStatus status = job.transcriptionJobStatus();
+            return response.transcriptionJob().transcriptionJobStatusAsString();
 
-            if (status == TranscriptionJobStatus.COMPLETED) {
-                return;
-            }
-            if (status == TranscriptionJobStatus.FAILED) {
-                throw new TranscribeRepositoryException("Transcription job failed: " + job.failureReason());
-            }
-            Thread.sleep(POLL_INTERVAL_MS);
+        } catch (TranscribeException e) {
+            log.error("Failed to get job status for {}", jobName, e);
+            throw new TranscribeRepositoryException("Failed to get transcription job status", e);
         }
     }
 
-    private String fetchTranscript(String jobName) throws Exception {
-        GetTranscriptionJobResponse response = transcribeClient.getTranscriptionJob(
-                GetTranscriptionJobRequest.builder().transcriptionJobName(jobName).build()
-        );
+    public String fetchTranscript(String jobName) throws TranscribeRepositoryException {
+        try {
+            GetTranscriptionJobResponse response = transcribeClient.getTranscriptionJob(
+                    GetTranscriptionJobRequest.builder()
+                            .transcriptionJobName(jobName)
+                            .build()
+            );
 
-        String transcriptUri = response.transcriptionJob().transcript().transcriptFileUri();
-        try (InputStream stream = new URL(transcriptUri).openStream()) {
-            ObjectMapper mapper = new ObjectMapper();
-            JsonNode json = mapper.readTree(stream);
+            String transcriptUrl = response.transcriptionJob().transcript().transcriptFileUri();
 
-            return json.path("results").path("transcripts").get(0).path("transcript").asText();
+            try (InputStream in = new URL(transcriptUrl).openStream()) {
+                JsonNode json = objectMapper.readTree(in);
+                return json.at("/results/transcripts/0/transcript").asText();
+            }
 
         } catch (Exception e) {
-            log.error("Failed to fetch or parse transcript for job: {}", jobName, e);
-            throw new TranscribeRepositoryException("Failed to fetch transcript from URI", e);
+            log.error("Failed to fetch transcript for job {}", jobName, e);
+            throw new TranscribeRepositoryException("Failed to fetch transcript", e);
         }
     }
 
-    private void deleteTranscriptionJob(String jobName) {
-        transcribeClient.deleteTranscriptionJob(
-                DeleteTranscriptionJobRequest.builder().transcriptionJobName(jobName).build()
-        );
+    public void deleteTranscriptionJob(String jobName) throws TranscribeRepositoryException {
+        try {
+            transcribeClient.deleteTranscriptionJob(DeleteTranscriptionJobRequest.builder()
+                    .transcriptionJobName(jobName)
+                    .build());
+
+        } catch (TranscribeException e) {
+            log.error("Failed to delete transcription job {}", jobName, e);
+            throw new TranscribeRepositoryException("Failed to delete transcription job", e);
+        }
+    }
+
+    //TODO maybe move this to S3Repository and than call from the Service layer
+    public void deleteAudioFileForJob(String jobName) throws TranscribeRepositoryException {
+        String s3Key = jobToS3KeyMap.get(jobName);
+        if (s3Key != null) {
+            s3Repository.deleteAudioFile(s3Key);
+            jobToS3KeyMap.remove(jobName);
+        } else {
+            log.warn("No S3 key found for job '{}'. File cleanup skipped.", jobName);
+        }
     }
 }

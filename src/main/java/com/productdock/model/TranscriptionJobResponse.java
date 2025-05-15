@@ -7,6 +7,8 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class SpeechToTextResponse {
+public class TranscriptionJobResponse {
+    private String jobName;
+    private String jobStatus;
     private String transcript;
 }
