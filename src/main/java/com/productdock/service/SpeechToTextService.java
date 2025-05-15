@@ -19,12 +19,14 @@ public class SpeechToTextService {
     private final S3Repository s3Repository;
     private final TranscribeRepository transcribeRepository;
 
-    //TODO should I introduce Retry mechanism here?
-
     /**
      * Starts a transcription job and returns the job name and initial status.
+     *
+     * @param audioFile the audio file to be converted
+     * @return TranscriptionJobResponse containing job name and status
+     * @throws SpeechToTextServiceException if an error occurs during the process
      */
-    public TranscriptionJobResponse startTranscriptionJob(MultipartFile audioFile) {
+    public TranscriptionJobResponse startTranscriptionJob(MultipartFile audioFile) throws SpeechToTextServiceException {
         try {
             String s3Key = s3Repository.uploadAudioFile(audioFile);
             String jobName = transcribeRepository.startTranscriptionJob(s3Key);
@@ -38,18 +40,17 @@ public class SpeechToTextService {
 
     /**
      * Checks the status of the transcription job and fetches transcript if done.
+     *
+     * @param jobName the transcription job name
+     * @return TranscriptionJobResponse containing job status and transcript if available
      */
-    public TranscriptionJobResponse getTranscriptionJobStatus(String jobName) {
+    public TranscriptionJobResponse getTranscriptionJobStatus(String jobName) throws SpeechToTextServiceException {
         try {
             String status = transcribeRepository.getJobStatus(jobName);
             String transcript = null;
 
             if ("COMPLETED".equals(status)) {
                 transcript = transcribeRepository.fetchTranscript(jobName);
-
-                // Cleanup only after job is done:
-                //transcribeRepository.deleteTranscriptionJob(jobName);
-                //transcribeRepository.deleteAudioFileForJob(jobName); // we’ll add this helper
             }
 
             return new TranscriptionJobResponse(jobName, status, transcript);

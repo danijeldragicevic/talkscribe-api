@@ -34,9 +34,7 @@ public class TextToSpeechController {
             produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
     public ResponseEntity<InputStreamResource> convertTextToSpeech(@Valid @RequestBody TextToSpeechRequest request) {
         log.info("Received request to convert text to speech");
-
         InputStreamResource resource = textToSpeechService.convertTextToSpeech(request.getText());
-
         return ResponseEntity.ok()
                 .headers(getAudioHeaders())
                 .body(resource);

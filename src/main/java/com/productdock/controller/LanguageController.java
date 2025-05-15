@@ -1,6 +1,7 @@
 package com.productdock.controller;
 
 import com.productdock.model.SupportedLangauge;
+import com.productdock.security.RateLimited;
 import com.productdock.service.SupportedVoicesService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,6 +25,7 @@ public class LanguageController {
      *
      * @return ResponseEntity containing the list of supported languages
      */
+    @RateLimited(requests = 20, durationMinutes = 1)
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<SupportedLangauge>> getSupportedLanguages() {
         log.info("Received request to get supported languages");

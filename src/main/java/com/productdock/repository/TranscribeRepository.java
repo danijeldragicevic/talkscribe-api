@@ -23,7 +23,6 @@ import java.util.concurrent.ConcurrentHashMap;
 public class TranscribeRepository {
 
     private final TranscribeClient transcribeClient;
-    private final S3Repository s3Repository;
     private final ObjectMapper objectMapper;
 
     // Maps job name -> S3 key (needed for cleanup later)
@@ -37,8 +36,13 @@ public class TranscribeRepository {
         log.info("TranscribeRepository initialized with bucket '{}'", bucketName);
     }
 
-    //TODO add comments to all methods
-
+    /**
+     *  Starts a transcription job for the provided audio file in S3.
+     *
+     * @param s3Key the S3 key of the audio file
+     * @return the name of the transcription job
+     * @throws TranscribeRepositoryException if an error occurs during the process
+     */
     public String startTranscriptionJob(String s3Key) throws TranscribeRepositoryException {
         String jobName = "job-" + UUID.randomUUID();
 
@@ -65,13 +69,19 @@ public class TranscribeRepository {
             transcribeClient.startTranscriptionJob(request);
             jobToS3KeyMap.put(jobName, s3Key);
             return jobName;
-
         } catch (TranscribeException e) {
             log.error("Failed to start transcription job", e);
             throw new TranscribeRepositoryException("Failed to start transcription job", e);
         }
     }
 
+    /**
+     * Checks the status of a transcription job.
+     *
+     * @param jobName the name of the transcription job
+     * @return the status of the transcription
+     * @throws TranscribeRepositoryException if an error occurs during the process
+     */
     public String getJobStatus(String jobName) throws TranscribeRepositoryException {
         try {
             GetTranscriptionJobResponse response = transcribeClient.getTranscriptionJob(
@@ -88,6 +98,13 @@ public class TranscribeRepository {
         }
     }
 
+    /**
+     * Fetches the transcript of a completed transcription job.
+     *
+     * @param jobName the name of the transcription job
+     * @return the transcript text
+     * @throws TranscribeRepositoryException if an error occurs during the process
+     */
     public String fetchTranscript(String jobName) throws TranscribeRepositoryException {
         try {
             GetTranscriptionJobResponse response = transcribeClient.getTranscriptionJob(
@@ -106,29 +123,6 @@ public class TranscribeRepository {
         } catch (Exception e) {
             log.error("Failed to fetch transcript for job {}", jobName, e);
             throw new TranscribeRepositoryException("Failed to fetch transcript", e);
-        }
-    }
-
-    public void deleteTranscriptionJob(String jobName) throws TranscribeRepositoryException {
-        try {
-            transcribeClient.deleteTranscriptionJob(DeleteTranscriptionJobRequest.builder()
-                    .transcriptionJobName(jobName)
-                    .build());
-
-        } catch (TranscribeException e) {
-            log.error("Failed to delete transcription job {}", jobName, e);
-            throw new TranscribeRepositoryException("Failed to delete transcription job", e);
-        }
-    }
-
-    //TODO maybe move this to S3Repository and than call from the Service layer
-    public void deleteAudioFileForJob(String jobName) throws TranscribeRepositoryException {
-        String s3Key = jobToS3KeyMap.get(jobName);
-        if (s3Key != null) {
-            s3Repository.deleteAudioFile(s3Key);
-            jobToS3KeyMap.remove(jobName);
-        } else {
-            log.warn("No S3 key found for job '{}'. File cleanup skipped.", jobName);
         }
     }
 }

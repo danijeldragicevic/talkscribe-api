@@ -33,7 +33,6 @@ public class S3Repository {
      * @throws S3RepositoryException if an error occurs during the upload
      */
     public String uploadAudioFile(MultipartFile audioFile) throws S3RepositoryException {
-        String originalFilename = audioFile.getOriginalFilename();
         String key = "audio-" + UUID.randomUUID() + ".mp3";
 
         PutObjectRequest putRequest = PutObjectRequest.builder()
@@ -44,7 +43,6 @@ public class S3Repository {
 
         try (InputStream inputStream = audioFile.getInputStream()) {
             s3Client.putObject(putRequest, RequestBody.fromInputStream(inputStream, audioFile.getSize()));
-
         } catch (S3Exception e) {
             log.error("Error uploading file to S3", e);
             throw new S3RepositoryException("Error uploading file to S3", e);
@@ -52,7 +50,6 @@ public class S3Repository {
             log.error("Unexpected error uploading file to S3", e);
             throw new S3RepositoryException("Unexpected error uploading file to S3", e);
         }
-
         return key;
     }
 
@@ -69,7 +66,6 @@ public class S3Repository {
                     .bucket(bucketName)
                     .key(s3Key)
                     .build());
-
         } catch (S3Exception e) {
             log.error("Error deleting file from S3", e);
             throw new S3RepositoryException("Error deleting file from S3", e);
