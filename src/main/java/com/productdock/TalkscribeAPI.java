@@ -7,13 +7,15 @@ import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.retry.annotation.EnableRetry;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 @Slf4j
 @Configuration
 @EnableRetry
 @EnableCaching
-@SpringBootApplication
+@EnableScheduling
 @EnableAspectJAutoProxy
+@SpringBootApplication
 public class TalkscribeAPI {
 
     public static void main(String[] args) {

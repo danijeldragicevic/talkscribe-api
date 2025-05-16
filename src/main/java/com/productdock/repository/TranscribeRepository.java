@@ -13,9 +13,7 @@ import software.amazon.awssdk.services.transcribe.model.*;
 
 import java.io.InputStream;
 import java.net.URL;
-import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
 
 @Slf4j
 @Repository
@@ -24,9 +22,6 @@ public class TranscribeRepository {
 
     private final TranscribeClient transcribeClient;
     private final ObjectMapper objectMapper;
-
-    // Maps job name -> S3 key (needed for cleanup later)
-    private final Map<String, String> jobToS3KeyMap = new ConcurrentHashMap<>();
 
     @Value("${aws.s3.transcribe.input-bucket}")
     private String bucketName;
@@ -67,7 +62,6 @@ public class TranscribeRepository {
 
         try {
             transcribeClient.startTranscriptionJob(request);
-            jobToS3KeyMap.put(jobName, s3Key);
             return jobName;
         } catch (TranscribeException e) {
             log.error("Failed to start transcription job", e);
@@ -123,6 +117,24 @@ public class TranscribeRepository {
         } catch (Exception e) {
             log.error("Failed to fetch transcript for job {}", jobName, e);
             throw new TranscribeRepositoryException("Failed to fetch transcript", e);
+        }
+    }
+
+    /**
+     * Deletes a transcription job.
+     *
+     * @param jobName the name of the transcription job to delete
+     * @throws TranscribeRepositoryException if an error occurs during the deletion
+     */
+    public void deleteTranscriptionJob(String jobName) throws TranscribeRepositoryException {
+        try {
+            transcribeClient.deleteTranscriptionJob(DeleteTranscriptionJobRequest.builder()
+                    .transcriptionJobName(jobName)
+                    .build());
+
+        } catch (TranscribeException e) {
+            log.error("Failed to delete transcription job {}", jobName, e);
+            throw new TranscribeRepositoryException("Failed to delete transcription job", e);
         }
     }
 }
