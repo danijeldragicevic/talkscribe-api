@@ -5,6 +5,8 @@ import com.productdock.security.RateLimited;
 import com.productdock.service.SpeechToTextService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.CacheControl;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -50,7 +52,13 @@ public class SpeechToTextController {
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<TranscriptionJobResponse> getJobStatus(@PathVariable String jobName) {
         log.info("Checking status for job: {}", jobName);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setCacheControl(CacheControl.noCache());
+
         TranscriptionJobResponse response = speechToTextService.getTranscriptionJobStatus(jobName);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok()
+                .headers(headers)
+                .body(response);
     }
 }
