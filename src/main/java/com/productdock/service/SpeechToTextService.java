@@ -70,7 +70,6 @@ public class SpeechToTextService {
 
     /**
      * Scheduled cleanup for orphaned or completed jobs.
-     * TODO: Implement cleanup to remove jobs older than one hour, not to remove all jobs every hour.
      */
     @Scheduled(fixedRate = 60 * 60 * 1000) // Every 1 hour
     public void scheduledCleanup() {
