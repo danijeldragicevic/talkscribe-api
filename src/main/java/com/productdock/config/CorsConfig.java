@@ -23,8 +23,8 @@ public class CorsConfig {
             @Override
             public void addCorsMappings(@NotNull CorsRegistry registry) {
                 registry.addMapping("/api/**")
-                        //.allowedOrigins("*")
-                        .allowedOrigins("https://talkscribe.org")
+                        .allowedOrigins("*")
+                        //.allowedOrigins("https://talkscribe.org")
                         .allowedMethods("GET", "POST", "OPTIONS")
                         .allowedHeaders("*");
             }
