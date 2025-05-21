@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.productdock</groupId>
     <artifactId>talkscribe-api</artifactId>
-    <version>1.0.3</version>
+    <version>1.0.4</version>
     <name>talkscribe-api</name>
     <description>Converts text to speech and speech to text</description>
     <parent>
