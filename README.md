@@ -57,10 +57,10 @@ docker run -d --name talkscribe-api \
 -e AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID \
 -e AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY \
 -e AWS_S3_TRANSCRIBE_INPUT_BUCKET=$AWS_S3_TRANSCRIBE_INPUT_BUCKET \
-talkscribe-api:image_version
+talkscribe-api:<your-image-version>
 ```
 ## GitHub Actions CI/CD
-This project includes a GitHub Actions workflow to build and push the Docker image to Amazon Elastic Container Registry (ECR). <p>
+This project includes a GitHub Actions workflow to build and push the Docker image to Amazon Elastic Container Registry (ECR). <br>
 Workflow location: `.github/workflows/build.yaml`
 
 Workflow Jobs:
@@ -125,7 +125,11 @@ Content-Type    application/octet-stream
 
 ### Translate speech to text
 Endpoint: `POST /speech-to-text` <br>
-**Note:** The maximum payload size for the `audioFile` is **1MB**.
+**Notes:** The speech-to-text feature operates asynchronously to handle longer transcription jobs. This process is split into two API calls:
+- Start Transcription: Use the `POST /api/speech-to-text` endpoint to submit an audio file for transcription. The response includes a jobName that uniquely identifies the transcription job.
+- Check Job Status: Use the `GET /api/speech-to-text/status/{jobName}` endpoint to check the status of the transcription job. When the job status is COMPLETE, the response will include the transcribed text.
+- The maximum payload size for the `audioFile` is **1MB**. <br>
+
 Example Request:
 ```commandline
 curl --request POST \
@@ -137,13 +141,31 @@ curl --request POST \
 Example Response:
 ```commandline
 Http-Status     200 OK
-Content-Type    application/octet-stream
+Content-Type    application/json
 ---
 {
-    "transcript": "This is my test voice recording."
+	"jobName": "job-3012093e-40a5-4945-9a81-86ca5ac0f6a3",
+	"jobStatus": "IN_PROGRESS",
+	"transcript": null
 }
 ```
-
+Example Request:
+```commandline
+curl --request GET \
+  --url http://localhost:8080:8080/api/speech-to-text/status/job-3012093e-40a5-4945-9a81-86ca5ac0f6a3 \
+  --header 'User-Agent: insomnia/11.0.0'
+```
+Example Response:
+```commandline
+Http-Status     200 OK
+Content-Type    application/json
+---
+{
+	"jobName": "job-3012093e-40a5-4945-9a81-86ca5ac0f6a3",
+	"jobStatus": "COMPLETED",
+	"transcript": "This is my test voice recording."
+}
+```
 ### Error Handling
 The application provides meaningful error responses, for example:
 ```commandline
@@ -168,7 +190,6 @@ Content-Type    application/json
     "path": "/api/speech-to-text"
 }
 ```
-
 ```commandline
 Http-Status     503 Service Unavailable
 Content-Type    application/json
