@@ -54,7 +54,7 @@ public class SpeechToTextController {
         log.info("Checking status for job: {}", jobName);
 
         HttpHeaders headers = new HttpHeaders();
-        headers.setCacheControl(CacheControl.noCache());
+        headers.setCacheControl(CacheControl.noStore().mustRevalidate());
 
         TranscriptionJobResponse response = speechToTextService.getTranscriptionJobStatus(jobName);
         return ResponseEntity.ok()
