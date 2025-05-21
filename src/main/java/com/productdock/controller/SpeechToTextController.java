@@ -46,7 +46,7 @@ public class SpeechToTextController {
      * @param jobName the transcription job name
      * @return job status and optionally transcript
      */
-    @RateLimited(requests = 20, durationMinutes = 1)
+    @RateLimited(requests = 10, durationMinutes = 5)
     @GetMapping(
             path = "/status/{jobName}",
             produces = MediaType.APPLICATION_JSON_VALUE)

@@ -25,7 +25,7 @@ public class LanguageController {
      *
      * @return ResponseEntity containing the list of supported languages
      */
-    @RateLimited(requests = 20, durationMinutes = 1)
+    @RateLimited(requests = 10, durationMinutes = 5)
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<SupportedLangauge>> getSupportedLanguages() {
         log.info("Received request to get supported languages");
