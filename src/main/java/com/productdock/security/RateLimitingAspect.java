@@ -45,7 +45,7 @@ public class RateLimitingAspect {
     }
 
     private Bucket newBucket(int requests, Duration duration) {
-        Refill refill = Refill.intervally(requests, duration);
+        Refill refill = Refill.greedy(requests, duration);
         Bandwidth limit = Bandwidth.classic(requests, refill);
         return Bucket.builder().addLimit(limit).build();
     }

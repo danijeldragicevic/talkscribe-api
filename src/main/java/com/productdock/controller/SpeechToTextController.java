@@ -24,12 +24,11 @@ public class SpeechToTextController {
      * Starts a transcription job for the provided audio file.
      *
      * @param audioFile the audio file to be converted
+     * TODO: mention that there is a payload size limit configurable in application.properties
      * @return ResponseEntity with the converted text and HTTP status code
      */
-    @RateLimited(requests = 20, durationMinutes = 1)
-    @PostMapping(
-            consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
-            produces = MediaType.APPLICATION_JSON_VALUE)
+    @RateLimited(requests = 10, durationMinutes = 5)
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<TranscriptionJobResponse> convertAudioToText(@RequestParam("audioFile") MultipartFile audioFile) {
         log.info("Received request to start transcription job");
         if (audioFile.isEmpty()) {
@@ -47,9 +46,7 @@ public class SpeechToTextController {
      * @return job status and optionally transcript
      */
     @RateLimited(requests = 10, durationMinutes = 5)
-    @GetMapping(
-            path = "/status/{jobName}",
-            produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(path = "/status/{jobName}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<TranscriptionJobResponse> getJobStatus(@PathVariable String jobName) {
         log.info("Checking status for job: {}", jobName);
 

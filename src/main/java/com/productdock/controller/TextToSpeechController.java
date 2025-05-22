@@ -29,9 +29,7 @@ public class TextToSpeechController {
      * @return ResponseEntity with the audio stream and HTTP status code
      */
     @RateLimited(requests = 10, durationMinutes = 5)
-    @PostMapping(
-            consumes = MediaType.APPLICATION_JSON_VALUE,
-            produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
     public ResponseEntity<InputStreamResource> convertTextToSpeech(@Valid @RequestBody TextToSpeechRequest request) {
         log.info("Received request to convert text to speech");
         InputStreamResource resource = textToSpeechService.convertTextToSpeech(request.getText());
