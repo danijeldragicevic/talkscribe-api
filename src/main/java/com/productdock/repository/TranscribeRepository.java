@@ -59,7 +59,6 @@ public class TranscribeRepository {
                         LanguageCode.PT_PT
                 )
                 .build();
-
         try {
             transcribeClient.startTranscriptionJob(request);
             return jobName;
@@ -83,9 +82,7 @@ public class TranscribeRepository {
                             .transcriptionJobName(jobName)
                             .build()
             );
-
             return response.transcriptionJob().transcriptionJobStatusAsString();
-
         } catch (TranscribeException e) {
             log.error("Failed to get job status for {}", jobName, e);
             throw new TranscribeRepositoryException("Failed to get transcription job status", e);
@@ -113,7 +110,6 @@ public class TranscribeRepository {
                 JsonNode json = objectMapper.readTree(in);
                 return json.at("/results/transcripts/0/transcript").asText();
             }
-
         } catch (Exception e) {
             log.error("Failed to fetch transcript for job {}", jobName, e);
             throw new TranscribeRepositoryException("Failed to fetch transcript", e);
@@ -131,7 +127,6 @@ public class TranscribeRepository {
             transcribeClient.deleteTranscriptionJob(DeleteTranscriptionJobRequest.builder()
                     .transcriptionJobName(jobName)
                     .build());
-
         } catch (TranscribeException e) {
             log.error("Failed to delete transcription job {}", jobName, e);
             throw new TranscribeRepositoryException("Failed to delete transcription job", e);

@@ -22,8 +22,17 @@ import java.util.concurrent.ConcurrentHashMap;
 @Component
 public class RateLimitingAspect {
 
+    // A thread-safe map to store rate-limiting buckets for each client IP
     private final Map<String, Bucket> buckets = new ConcurrentHashMap<>();
 
+    /**
+     * Aspect method to apply rate limiting to methods annotated with @RateLimited.
+     * It checks if the client has exceeded the allowed number of requests within the specified time window.
+     *
+     * @param joinPoint the join point representing the method being intercepted
+     * @return the result of the intercepted method if the rate limit is not exceeded
+     * @throws Throwable if the rate limit is exceeded or the intercepted method throws an exception
+     */
     @Around("@annotation(com.productdock.security.RateLimited)")
     public Object rateLimit(ProceedingJoinPoint joinPoint) throws Throwable {
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
@@ -44,6 +53,13 @@ public class RateLimitingAspect {
         return joinPoint.proceed();
     }
 
+    /**
+     * Creates a new rate-limiting bucket with the specified request limit and duration.
+     *
+     * @param requests the maximum number of requests allowed
+     * @param duration the time window for the rate limit
+     * @return a new Bucket instance configured with the specified limits
+     */
     private Bucket newBucket(int requests, Duration duration) {
         Refill refill = Refill.greedy(requests, duration);
         Bandwidth limit = Bandwidth.classic(requests, refill);

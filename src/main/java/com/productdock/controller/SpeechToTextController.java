@@ -24,7 +24,6 @@ public class SpeechToTextController {
      * Starts a transcription job for the provided audio file.
      *
      * @param audioFile the audio file to be converted
-     * TODO: mention that there is a payload size limit configurable in application.properties
      * @return ResponseEntity with the converted text and HTTP status code
      */
     @RateLimited(requests = 10, durationMinutes = 5)
@@ -50,12 +49,21 @@ public class SpeechToTextController {
     public ResponseEntity<TranscriptionJobResponse> getJobStatus(@PathVariable String jobName) {
         log.info("Checking status for job: {}", jobName);
 
+        TranscriptionJobResponse response = speechToTextService.getTranscriptionJobStatus(jobName);
+
+        return ResponseEntity.ok()
+                .headers(getNoCacheHeaders())
+                .body(response);
+    }
+
+    /**
+     * Creates HTTP headers to prevent caching of the response.
+     *
+     * @return HttpHeaders with no-cache directive
+     */
+    private HttpHeaders getNoCacheHeaders() {
         HttpHeaders headers = new HttpHeaders();
         headers.setCacheControl(CacheControl.noStore().mustRevalidate());
-
-        TranscriptionJobResponse response = speechToTextService.getTranscriptionJobStatus(jobName);
-        return ResponseEntity.ok()
-                .headers(headers)
-                .body(response);
+        return headers;
     }
 }

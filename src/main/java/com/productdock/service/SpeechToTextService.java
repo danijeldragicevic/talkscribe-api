@@ -22,7 +22,7 @@ public class SpeechToTextService {
 
     private final S3Repository s3Repository;
     private final TranscribeRepository transcribeRepository;
-    private final Map<String, String> jobToS3KeyMap = new ConcurrentHashMap<>();
+    private final Map<String, String> jobsPendingCleanup = new ConcurrentHashMap<>();
 
     /**
      * Starts a transcription job and returns the job name and initial status.
@@ -37,7 +37,7 @@ public class SpeechToTextService {
             String jobName = transcribeRepository.startTranscriptionJob(s3Key);
 
             // Store into the map for scheduled cleanup
-            jobToS3KeyMap.put(jobName, s3Key);
+            jobsPendingCleanup.put(jobName, s3Key);
 
             return new TranscriptionJobResponse(jobName, "IN_PROGRESS", null);
         } catch (S3RepositoryException | TranscribeRepositoryException e) {
@@ -51,6 +51,7 @@ public class SpeechToTextService {
      *
      * @param jobName the transcription job name
      * @return TranscriptionJobResponse containing job status and transcript if available
+     * @throws SpeechToTextServiceException if an error occurs during the process
      */
     public TranscriptionJobResponse getTranscriptionJobStatus(String jobName) throws SpeechToTextServiceException {
         try {
@@ -69,13 +70,14 @@ public class SpeechToTextService {
     }
 
     /**
-     * Scheduled cleanup for orphaned or completed jobs.
+     * Scheduled cleanup for completed or failed jobs.
+     * Runs every 1 hour.
      */
-    @Scheduled(fixedRate = 60 * 60 * 1000) // Every 1 hour
+    @Scheduled(fixedRate = 60 * 60 * 1000)
     public void scheduledCleanup() {
         log.info("Running scheduled cleanup...");
 
-        for (Map.Entry<String, String> entry : jobToS3KeyMap.entrySet()) {
+        for (Map.Entry<String, String> entry : jobsPendingCleanup.entrySet()) {
             String jobName = entry.getKey();
             String s3Key = entry.getValue();
 
@@ -85,7 +87,7 @@ public class SpeechToTextService {
                 if ("COMPLETED".equals(status) || "FAILED".equals(status)) {
                     transcribeRepository.deleteTranscriptionJob(jobName);
                     s3Repository.deleteAudioFile(s3Key);
-                    jobToS3KeyMap.remove(jobName);
+                    jobsPendingCleanup.remove(jobName);
                     log.info("Cleaned up job '{}' and file '{}'", jobName, s3Key);
                 }
             } catch (Exception e) {

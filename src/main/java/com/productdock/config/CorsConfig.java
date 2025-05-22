@@ -13,7 +13,7 @@ public class CorsConfig {
      * Configures CORS settings for the application.
      * <p>
      * This method allows cross-origin requests from the frontend app to the "/api/**" endpoints
-     * with GET and POST methods.
+     * with GET, POST and OPTIONS methods.
      *
      * @return a WebMvcConfigurer instance with CORS configuration.
      */
@@ -23,8 +23,8 @@ public class CorsConfig {
             @Override
             public void addCorsMappings(@NotNull CorsRegistry registry) {
                 registry.addMapping("/api/**")
-                        .allowedOrigins("*")
-                        //.allowedOrigins("https://talkscribe.org")
+                        //.allowedOrigins("*")
+                        .allowedOrigins("https://talkscribe.org")
                         .allowedMethods("GET", "POST", "OPTIONS")
                         .allowedHeaders("*");
             }
