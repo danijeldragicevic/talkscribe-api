@@ -1,0 +1,23 @@
+# Spring application name
+spring.application.name: talkscribe-api
+
+# Server port
+server.port: 8080
+
+# AWS configuration
+aws.region: ${AWS_REGION}
+aws.s3.transcribe.input-bucket: ${AWS_S3_TRANSCRIBE_INPUT_BUCKET}
+
+# Logging level
+logging.level.org.springframework: INFO
+logging.level.com.productdock: INFO
+
+# Enable throwing NoHandlerFoundException for non-existing endpoints
+spring.mvc.throw-exception-if-no-handler-found: true
+
+# Disable default resource mappings
+spring.web.resources.add-mappings: false
+
+# Define maximum file size for multipart requests
+spring.servlet.multipart.max-file-size: 1MB
+spring.servlet.multipart.max-request-size: 1MB
