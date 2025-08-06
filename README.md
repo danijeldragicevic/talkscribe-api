@@ -7,6 +7,8 @@
 ## Overview
 TalkScribe API is a Spring Boot application that provides an API for text-to-speech and speech-to-text conversion using AWS Polly and Transcribe. You can test and interact with this API through the frontend application available at [https://talkscribe.org/](https://talkscribe.org/).
 
+For a deeper dive into the concepts and use cases demonstrated by this project, please refer to the accompanying blog post: [Integrating TTS and STT in Java for WCAG Accessibility](https://productdock.com/integrating-tts-and-stt-in-java-for-wcag-accessibility/).
+
 ## Features
 - Text-to-speech using AWS Polly
 - Speech-to-text using AWS Transcribe
